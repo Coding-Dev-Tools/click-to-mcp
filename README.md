@@ -10,7 +10,7 @@
 [![YuzeHao MCP](https://img.shields.io/badge/YuzeHao_Awesome_MCP-Submitted-grey?logo=github)](https://github.com/YuzeHao2023/Awesome-MCP-Servers)<!-- issue #251 -->
 [![MobinX MCP](https://img.shields.io/badge/MobinX_Awesome_MCP-Submitted-grey?logo=github)](https://github.com/MobinX/awesome-mcp-list)<!-- issue #273 -->
 [![Awesome MCP Servers 2](https://img.shields.io/badge/Awesome_MCP_Servers_2-Listed-blue?logo=github)](https://github.com/Coding-Dev-Tools/awesome-mcp-servers-2)<!-- merged PR #1 -->
-[![DhanushNehru Awesome MCP](https://img.shields.io/badge/DhanushNehru_Awesome_MCP-Submitted-grey?logo=github)](https://github.com/DhanushNehru/awesome-mcp-servers)<!-- PR #21 -->
+[![DhanushNehru Awesome MCP](https://img.shields.io/badge/DhanushNehru_Awesome_MCP-Submitted-grey?logo=github)](https://github.com/DhanushNehru/awesome-mcp-servers)<!-- PR #22 -->
 [![Best of MCP Servers](https://img.shields.io/badge/Best_of_MCP_Servers-Submitted-grey?logo=github)](https://github.com/tolkonepiu/best-of-mcp-servers)<!-- PR #196 -->
 [![WagnerAgent MCP DevOps](https://img.shields.io/badge/WagnerAgent_MCP_DevOps-Submitted-grey?logo=github)](https://github.com/WagnerAgent/awesome-mcp-servers-devops)<!-- PR #41 -->
 [![AgenticDevOps MCP](https://img.shields.io/badge/AgenticDevOps_MCP-Submitted-grey?logo=github)](https://github.com/agenticdevops/awesome-devops-mcp)<!-- PR #28 -->
