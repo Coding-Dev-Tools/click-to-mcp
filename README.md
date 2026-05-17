@@ -14,6 +14,9 @@
 [![Best of MCP Servers](https://img.shields.io/badge/Best_of_MCP_Servers-Submitted-grey?logo=github)](https://github.com/tolkonepiu/best-of-mcp-servers)<!-- PR #196 -->
 [![WagnerAgent MCP DevOps](https://img.shields.io/badge/WagnerAgent_MCP_DevOps-Submitted-grey?logo=github)](https://github.com/WagnerAgent/awesome-mcp-servers-devops)<!-- PR #41 -->
 [![AgenticDevOps MCP](https://img.shields.io/badge/AgenticDevOps_MCP-Submitted-grey?logo=github)](https://github.com/agenticdevops/awesome-devops-mcp)<!-- PR #28 -->
+[![HeyClaude MCP](https://img.shields.io/badge/HeyClaude_Awesome_Claude-Submitted-grey?logo=github)](https://github.com/JSONbored/awesome-claude)<!-- issue #377 -->
+[![Claude Code Plugins](https://img.shields.io/badge/Claude_Code_Plugins-Submitted-grey?logo=github)](https://github.com/ccplugins/awesome-claude-code-plugins)<!-- PR #218 -->
+[![MCP Finder](https://img.shields.io/badge/mcp-finder_Awesome_MCP-Submitted-grey?logo=github)](https://github.com/mcp-finder/awesome-mcp-servers)<!-- PR #1 -->
 
 Auto-wrap any [Click](https://click.palletsprojects.com/)/[typer](https://typer.tiangolo.com/) CLI as an [MCP](https://modelcontextprotocol.io/) (Model Context Protocol) server.
 
