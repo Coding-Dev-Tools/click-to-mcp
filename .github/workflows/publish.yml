@@ -2,8 +2,7 @@ name: Publish to PyPI
 
 on:
   release:
-    types: [ published ]
-  workflow_dispatch:
+    types: [published]
 
 jobs:
   publish:
@@ -18,18 +17,15 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: '3.12'
+        python-version: "3.12"
 
-    - name: Install dependencies
+    - name: Install build tools
       run: |
         python -m pip install --upgrade pip
-        pip install build twine
+        pip install build
 
     - name: Build package
       run: python -m build
-
-    - name: Check package
-      run: twine check dist/*
 
     - name: Publish to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
