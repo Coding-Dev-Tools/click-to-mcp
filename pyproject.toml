@@ -27,3 +27,8 @@ click-to-mcp-demo = "click_to_mcp.demo:cli"
 
 [tool.setuptools.packages.find]
 include = ["click_to_mcp*"]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+]
