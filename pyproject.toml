@@ -1,13 +1,13 @@
 [build-system]
-requires = ["setuptools>=68.0", "wheel"]
+requires = ["setuptools>=64", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "click-to-mcp"
 version = "0.4.0"
-description = "Auto-wrap any Click/typer CLI as an MCP (Model Context Protocol) server â€” with auto-discovery, stdio, HTTP+SSE, and Streamable HTTP transport"
+description = "Auto-wrap any Click/typer CLI as an MCP (Model Context Protocol) server — with auto-discovery"
 readme = "README.md"
-license = { text = "Apache-2.0" }
+license = { text = "MIT" }
 authors = [
     { name = "Revenue Holdings", email = "dev@revenueholdings.dev" },
 ]
@@ -15,30 +15,7 @@ requires-python = ">=3.10"
 dependencies = [
     "click>=8.0",
 ]
-keywords = ["mcp", "click", "cli", "model-context-protocol", "ai", "discovery", "sse", "http", "agent"]
-classifiers = [
-    "Development Status :: 4 - Beta",
-    "Intended Audience :: Developers",
-    "Topic :: Software Development :: Libraries :: Python Modules",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
-]
-
-[project.optional-dependencies]
-http = [
-    "starlette>=0.27",
-    "uvicorn>=0.20",
-    "sse-starlette>=1.0",
-]
-license = [
-    "revenueholdings-license>=0.1.0",
-]
-dev = [
-    "pytest>=7.0",
-    "httpx>=0.24",
-]
+keywords = ["mcp", "click", "cli", "model-context-protocol", "ai", "discovery"]
 
 [project.urls]
 Homepage = "https://github.com/Coding-Dev-Tools/click-to-mcp"
@@ -50,14 +27,3 @@ click-to-mcp-demo = "click_to_mcp.demo:cli"
 
 [tool.setuptools.packages.find]
 include = ["click_to_mcp*"]
-
-[tool.ruff]
-target-version = "py310"
-line-length = 120
-
-[tool.ruff.lint]
-select = ["E", "F", "W", "I", "UP", "B", "SIM"]
-ignore = ["E501"]
-
-[tool.ruff.lint.isort]
-known-first-party = ["*"]
