@@ -4,8 +4,8 @@
 [![PyPI](https://img.shields.io/pypi/v/click-to-mcp)](https://pypi.org/project/click-to-mcp/)
 [![Open Source Alternative](https://img.shields.io/badge/Open_Source_Alternative-%E2%87%92-blue?logo=opensourceinitiative)](https://www.opensourcealternative.to/project/click-to-mcp)
 [![LibHunt](https://img.shields.io/badge/LibHunt-%E2%87%92-blue?logo=codeigniter)](https://www.libhunt.com/r/Coding-Dev-Tools/click-to-mcp)
-[![Awesome MCP](https://img.shields.io/badge/Awesome_MCP-%E2%87%92-blue?logo=github)](https://github.com/punkpeye/awesome-mcp-servers)
-[![Awesome Python](https://img.shields.io/badge/Awesome_Python-%E2%87%92-blue?logo=python)](https://github.com/uhub/awesome-python)
+[![TensorBlock Awesome MCP](https://img.shields.io/badge/TensorBlock_Awesome_MCP-%E2%87%92-blue?logo=github)](https://github.com/TensorBlock/awesome-mcp-servers)
+[![Punkpeye Awesome MCP](https://img.shields.io/badge/Punkpeye_Awesome_MCP-%E2%87%92-grey?logo=github)](https://github.com/punkpeye/awesome-mcp-servers)<!-- pending PR #6496 -->
 
 Auto-wrap any [Click](https://click.palletsprojects.com/)/[typer](https://typer.tiangolo.com/) CLI as an [MCP](https://modelcontextprotocol.io/) (Model Context Protocol) server.
 
