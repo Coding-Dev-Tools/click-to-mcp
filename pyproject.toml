@@ -32,3 +32,9 @@ include = ["click_to_mcp*"]
 dev = [
     "pytest>=7.0.0",
 ]
+http = [
+    "httpx>=0.27.0",
+    "starlette>=0.37.0",
+    "uvicorn>=0.27.0",
+    "sse-starlette>=1.6.0",
+]
