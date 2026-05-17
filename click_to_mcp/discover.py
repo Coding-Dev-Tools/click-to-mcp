@@ -8,9 +8,12 @@ them as MCP servers.
 from __future__ import annotations
 
 import importlib
+import logging
 from dataclasses import dataclass
 from importlib.metadata import distribution, entry_points
 from typing import Any
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -47,6 +50,7 @@ def _get_package_metadata(pkg_name: str) -> str:
         dist = distribution(pkg_name)
         return dist.metadata.get("Summary", "") or ""
     except Exception:
+        logger.debug("Failed to get metadata for %s", pkg_name)
         return ""
 
 
@@ -86,6 +90,7 @@ def scan_entry_points() -> list[DiscoveredCLI]:
                 is_typer=(cli_type == "typer"),
             ))
         except Exception:
+            logger.debug("Failed to load entry point %s", entry_point.name)
             continue
 
     return discovered
@@ -110,6 +115,7 @@ def load_cli(cli_name: str) -> Any | None:
             try:
                 return entry_point.load()
             except Exception:
+                logger.debug("Failed to load CLI %s", cli_name)
                 return None
     return None
 
@@ -135,6 +141,7 @@ def import_cli(module_path: str, attr_name: str) -> Any | None:
                 return obj
         return module
     except Exception:
+        logger.debug("Failed to import %s.%s", module_path, attr_name)
         return None
 
 
@@ -161,6 +168,7 @@ def find_our_clis() -> dict[str, Any]:
                 if _probe_cli_type(obj) != "unknown":
                     result[ep.name] = obj
             except Exception:
+                logger.debug("Failed to load entry point %s for our CLIs", ep.name)
                 continue
 
     return result

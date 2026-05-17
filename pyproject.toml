@@ -17,6 +17,18 @@ dependencies = [
 ]
 keywords = ["mcp", "click", "cli", "model-context-protocol", "ai", "discovery"]
 
+[project.optional-dependencies]
+licensing = ["revenueholdings-license>=0.1.0"]
+dev = [
+  "pytest>=7.0",
+  "pytest-cov>=4.0",
+]
+http = [
+  "starlette>=0.27",
+  "uvicorn>=0.20",
+  "sse-starlette>=1.6",
+]
+
 [project.urls]
 Homepage = "https://github.com/Coding-Dev-Tools/click-to-mcp"
 Repository = "https://github.com/Coding-Dev-Tools/click-to-mcp"

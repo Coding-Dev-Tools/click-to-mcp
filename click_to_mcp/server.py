@@ -11,6 +11,8 @@ from typing import Any
 
 from .adapter import CliToolDef, cli_to_mcp_tools
 
+_VERSION = "0.4.0"
+
 
 def _make_jsonrpc_response(request_id: Any, result: Any = None, error: dict | None = None) -> str:
     """Build a JSON-RPC 2.0 response."""
@@ -48,7 +50,7 @@ def serve_stdio(
 
     server_info = {
         "name": name,
-        "version": "0.1.0",
+        "version": _VERSION,
         "description": description or f"MCP server for {name}",
     }
 

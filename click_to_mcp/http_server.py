@@ -80,7 +80,7 @@ def serve_http(
 
     server_info = {
         "name": name,
-        "version": "0.3.0",
+        "version": "0.4.0",
         "description": description or f"MCP server for {name}",
     }
 

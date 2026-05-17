@@ -20,6 +20,18 @@ All notable changes to click-to-mcp will be documented in this file.
 - Version bumped to 0.4.0
 - `initialize` response now includes `"streamableHttp": {}` capability
 
+## [0.3.0] — 2026-05-15
+
+### Added
+
+- HTTP+SSE transport support (`click-to-mcp serve-http`, `click-to-mcp demo-http`)
+- `run_http()` library API for HTTP+SSE transport
+- Optional `[http]` extra for Flask/requests dependencies
+
+### Changed
+
+- Version bumped to 0.3.0
+
 ## [0.2.1] — 2026-05-15
 
 ### Added
