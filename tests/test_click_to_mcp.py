@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import click
 import contextlib
 import dataclasses
 import json
@@ -56,6 +57,33 @@ class TestAdapter:
         assert op_prop is not None, "calculate tool should have an 'operation' property"
         assert "enum" in op_prop, "operation property should have enum from click.Choice"
         assert set(op_prop["enum"]) == {"add", "sub", "mul", "div"}
+
+    # -- edge cases -----------------------------------------------------------
+
+    def test_empty_group_returns_no_tools(self) -> None:
+        """An empty Click group should return an empty tools list."""
+        empty_group = click.Group(name="empty")
+        result = cli_to_mcp_tools(empty_group)
+        assert isinstance(result, list)
+        assert len(result) == 0
+
+    def test_handler_invalid_choice_returns_is_error(self, tools: list[CliToolDef]) -> None:
+        """An invalid choice value should cause handler to raise."""
+        calc = next(t for t in tools if t.name == "calculate")
+        with pytest.raises((RuntimeError, SystemExit)):
+            calc.handler(a=1, b=2, operation="invalid_op")
+
+    def test_bool_flag_option(self, tools: list[CliToolDef]) -> None:
+        """Boolean flag options should have 'boolean' type in schema."""
+        config_show = next(t for t in tools if t.name == "config_show")
+        verbose_prop = config_show.input_schema["properties"].get("verbose")
+        assert verbose_prop is not None
+        assert verbose_prop["type"] == "boolean"
+
+    def test_description_preserved(self, tools: list[CliToolDef]) -> None:
+        """Click command help text should be preserved as tool description."""
+        greet = next(t for t in tools if t.name == "greet")
+        assert greet.description == "Greet someone with a customizable message."
 
     # -- handler invocation ---------------------------------------------------
 
