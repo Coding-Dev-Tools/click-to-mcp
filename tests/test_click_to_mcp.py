@@ -164,6 +164,20 @@ class TestServer:
         assert "error" in call_resp, "Expected an error response for unknown tool"
         assert call_resp["error"]["code"] == -32602
 
+    def test_notifications_initialized_returns_no_response(self) -> None:
+        """The 'notifications/initialized' notification should produce no output."""
+        responses = _run_server([
+            {"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {}},
+            {"jsonrpc": "2.0", "method": "notifications/initialized", "params": {}},
+            {"jsonrpc": "2.0", "id": 2, "method": "tools/list", "params": {}},
+        ])
+        # Should have exactly 2 responses (initialize + tools/list, no response for notification)
+        assert len(responses) == 2
+        # First response should be initialize
+        assert responses[0]["id"] == 1
+        # Second response should be tools/list
+        assert responses[1]["id"] == 2
+
 
 # ---------------------------------------------------------------------------
 # TestDiscover — tests for the discovery module

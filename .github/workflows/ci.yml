@@ -10,15 +10,15 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v4.2.2
 
     - name: Set up Python
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v5.4.0
       with:
         python-version: '3.12'
 
     - name: Install ruff
-      run: pip install ruff
+      run: pip install "ruff>=0.9.0,<1.0"
 
     - name: Run ruff check
       run: ruff check .
@@ -32,10 +32,10 @@ jobs:
       CLICK_TO_MCP_NO_LICENSE: "1"
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v4.2.2
 
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v5.4.0
       with:
         python-version: ${{ matrix.python-version }}
 

@@ -38,13 +38,14 @@ license = [
 dev = [
     "pytest>=7.0",
     "httpx>=0.24",
+    "ruff>=0.9.0,<1.0",
 ]
 
 [project.urls]
 Homepage = "https://github.com/Coding-Dev-Tools/click-to-mcp"
 Repository = "https://github.com/Coding-Dev-Tools/click-to-mcp"
 Changelog = "https://github.com/Coding-Dev-Tools/click-to-mcp/blob/master/CHANGELOG.md"
-Bug Tracker = "https://github.com/Coding-Dev-Tools/click-to-mcp/issues"
+"Bug Tracker" = "https://github.com/Coding-Dev-Tools/click-to-mcp/issues"
 
 [project.scripts]
 click-to-mcp = "click_to_mcp.cli:main"
