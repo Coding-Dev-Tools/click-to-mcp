@@ -2,6 +2,7 @@
 <!-- mcp-name: io.github.coding-dev-tools/click-to-mcp -->
 
 [![CI](https://github.com/Coding-Dev-Tools/click-to-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/Coding-Dev-Tools/click-to-mcp/actions/workflows/ci.yml)
+[![PyPI](https://img.shields.io/pypi/v/click-to-mcp)](https://pypi.org/project/click-to-mcp/)
 [![GitHub stars](https://img.shields.io/github/stars/Coding-Dev-Tools/click-to-mcp?style=social)](https://github.com/Coding-Dev-Tools/click-to-mcp/stargazers)
 [![Awesome MCP Server](https://img.shields.io/badge/Awesome_MCP_Server-Listed-brightgreen?logo=github)](https://github.com/abordage/awesome-mcp)
 [![Awesome Codex CLI](https://img.shields.io/badge/Awesome_Codex_CLI-Listed-brightgreen?logo=github)](https://github.com/milisp/awesome-codex-cli)
@@ -41,16 +42,21 @@ Works with [Revenue Holdings CLI tools](https://coding-dev-tools.github.io/reven
 
 ## Quick Start
 
-Install from GitHub (recommended, package publishing pending):
+Install from PyPI (recommended):
 
 ```bash
-pip install git+https://github.com/Coding-Dev-Tools/click-to-mcp.git
+pip install click-to-mcp
 ```
 
 For HTTP+SSE transport (web-based MCP clients), install with the `http` extra:
 
 ```bash
-pip install "click-to-mcp[http] @ git+https://github.com/Coding-Dev-Tools/click-to-mcp.git"
+pip install "click-to-mcp[http]"
+```
+
+Install directly from GitHub (latest development version):
+```bash
+pip install git+https://github.com/Coding-Dev-Tools/click-to-mcp.git
 ```
 
 Or install via Homebrew (macOS/Linux):
