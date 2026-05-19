@@ -2,7 +2,7 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.coding-dev-tools/click-to-mcp",
   "title": "Click to MCP",
-  "description": "Auto-wrap Python Click or Typer CLI tools as MCP servers — zero-code transformation. Supports FastMCP, stdio, and SSE transport with automatic tool discovery.",
+  "description": "Auto-wrap Python Click or Typer CLI tools as MCP servers — zero-code transformation. Supports stdio, HTTP+SSE, and Streamable HTTP transport with automatic tool discovery.",
   "version": "0.5.0",
   "packages": [
     {
