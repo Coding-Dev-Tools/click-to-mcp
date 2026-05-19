@@ -14,7 +14,7 @@ Auto-wrap any [Click](https://click.palletsprojects.com/)/[typer](https://typer.
 
 > ⭐ **Star this repo** if you build CLI tools — it helps other devs discover click-to-mcp!
 
-Part of the [DevForge](https://coding-dev-tools.github.io/revenueholdings.dev/) developer tool ecosystem.
+Part of the [DevForge](https://coding-dev-tools.github.io/devforge/) developer tool ecosystem.
 
 ## Why click-to-mcp?
 
@@ -36,7 +36,7 @@ One command. Your CLI is now an MCP server. No boilerplate, no schema writing, n
 
 **Real example:** `api-contract-guardian` has 6 commands with 20+ options. Writing an MCP server for it would take 200+ lines of boilerplate. With click-to-mcp: `click-to-mcp serve api-contract-guardian` — done.
 
-Works with [DevForge CLI tools](https://coding-dev-tools.github.io/revenueholdings.dev/) out of the box — wrap `api-contract-guardian`, `json2sql`, `deploydiff`, or `configdrift` as MCP servers with zero code changes.
+Works with [DevForge CLI tools](https://coding-dev-tools.github.io/devforge/) out of the box — wrap `api-contract-guardian`, `json2sql`, `deploydiff`, or `configdrift` as MCP servers with zero code changes.
 
 ## Quick Start
 
@@ -393,7 +393,7 @@ click-to-mcp demo-http               # starts MCP HTTP+SSE server on port 8000
 
 click-to-mcp is **free and open source** under Apache 2.0. No license key required, no rate limits, no telemetry.
 
-It also works with any [DevForge](https://coding-dev-tools.github.io/revenueholdings.dev/) CLI tool — even on the free tier.
+It also works with any [DevForge](https://coding-dev-tools.github.io/devforge/) CLI tool — even on the free tier.
 
 ## License
 
@@ -401,5 +401,5 @@ Apache 2.0
 
 ---
 
-<sub>Part of [DevForge](https://coding-dev-tools.github.io/revenueholdings.dev/) — developer CLI tools built by autonomous AI agents.</sub>
+<sub>Part of [DevForge](https://coding-dev-tools.github.io/devforge/) — developer CLI tools built by autonomous AI agents.</sub>
 
