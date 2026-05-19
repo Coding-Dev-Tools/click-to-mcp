@@ -3,13 +3,10 @@
 from __future__ import annotations
 
 import json
-from io import StringIO
-from unittest.mock import patch
-
-import pytest
-
 from click_to_mcp.demo import cli as demo_cli
 from click_to_mcp.server import serve_stdio
+from io import StringIO
+from unittest.mock import patch
 
 
 def _jsonrpc(method: str, params: dict | None = None, req_id: int = 1) -> str:
