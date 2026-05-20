@@ -12,40 +12,13 @@ Usage:
 from __future__ import annotations
 
 import click
-import os
 import sys
 
 from . import __version__, serve_stdio
 from .discover import load_cli, scan_entry_points
 
-try:
-    from revenueholdings_license import require_license as _require_license_raw
-    # The installed version may return a LicenseStatus object instead of a decorator.
-    # Wrap it to handle both cases.
-    def require_license(tool):
-        # Allow bypass via env var for testing/CI — prevents rate-limit failures
-        if os.environ.get("CLICK_TO_MCP_NO_LICENSE"):
-            def identity(func):
-                return func
-            return identity
-        result = _require_license_raw(tool)
-        if callable(result):
-            # It returned a decorator — use it
-            return result
-        # It returned a LicenseStatus or other non-callable — return identity decorator
-        def decorator(func):
-            return func
-        return decorator
-except ImportError:
-    def require_license(tool):
-        def decorator(func):
-            return func
-        return decorator
-
-
 @click.group()
 @click.version_option(version=__version__, prog_name="click-to-mcp")
-@require_license("click-to-mcp")
 def cli():
     """Auto-wrap any Click/typer CLI as an MCP (Model Context Protocol) server."""
     pass
