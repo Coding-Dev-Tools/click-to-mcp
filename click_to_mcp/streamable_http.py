@@ -17,6 +17,7 @@ import json
 import traceback
 from typing import Any
 
+from ._version import __version__
 from .adapter import CliToolDef, cli_to_mcp_tools
 
 
@@ -82,7 +83,7 @@ def serve_http_streamable(
 
     server_info = {
         "name": name,
-        "version": "0.4.0",
+        "version": __version__,
         "description": description or f"MCP server for {name}",
     }
 

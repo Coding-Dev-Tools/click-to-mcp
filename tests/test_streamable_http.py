@@ -6,6 +6,7 @@ import httpx
 import pytest
 import threading
 import time
+from click_to_mcp._version import __version__
 from click_to_mcp.demo import cli as demo_cli
 from collections.abc import Generator
 
@@ -93,6 +94,22 @@ class TestInitialize:
         assert result["serverInfo"]["name"] == "test-server"
         assert "tools" in result["capabilities"]
         assert "streamableHttp" in result["capabilities"]
+
+    def test_initialize_reports_package_version(self, streamable_server, base_url: str) -> None:
+        """The streamable HTTP server must report the actual package version."""
+        msg = {
+            "jsonrpc": "2.0",
+            "id": 10,
+            "method": "initialize",
+            "params": {},
+        }
+        resp = httpx.post(f"{base_url}/message", json=msg)
+        assert resp.status_code == 200
+        server_version = resp.json()["result"]["serverInfo"]["version"]
+        assert server_version == __version__, (
+            f"streamable HTTP reports version {server_version!r}, "
+            f"but package version is {__version__!r}"
+        )
 
 
 # ---------------------------------------------------------------------------
