@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import click
 import pytest
+
 from click_to_mcp.adapter import (
     _build_click_tool_def,
     _click_type_to_json_schema,

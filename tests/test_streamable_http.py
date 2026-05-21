@@ -2,13 +2,15 @@
 
 from __future__ import annotations
 
-import httpx
-import pytest
 import threading
 import time
+from collections.abc import Generator
+
+import httpx
+import pytest
+
 from click_to_mcp._version import __version__
 from click_to_mcp.demo import cli as demo_cli
-from collections.abc import Generator
 
 # ---------------------------------------------------------------------------
 # TestStreamableHTTP — integration tests via HTTP client

@@ -11,11 +11,13 @@ Usage:
 
 from __future__ import annotations
 
-import click
 import sys
+
+import click
 
 from . import __version__, serve_stdio
 from .discover import load_cli, scan_entry_points
+
 
 @click.group()
 @click.version_option(version=__version__, prog_name="click-to-mcp")

@@ -4,11 +4,12 @@ MCP Tool Definitions: Adapter that introspects Click/typer CLIs.
 
 from __future__ import annotations
 
-import click
 import dataclasses
 import inspect
 from collections.abc import Callable
 from typing import Any
+
+import click
 
 
 @dataclasses.dataclass

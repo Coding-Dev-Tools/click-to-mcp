@@ -2,13 +2,15 @@
 
 from __future__ import annotations
 
-import click
 import contextlib
 import dataclasses
 import json
-import pytest
 import subprocess
 import sys
+
+import click
+import pytest
+
 from click_to_mcp.adapter import CliToolDef, cli_to_mcp_tools
 from click_to_mcp.demo import cli as demo_cli
 from click_to_mcp.discover import DiscoveredCLI, find_our_clis, import_cli, scan_entry_points
