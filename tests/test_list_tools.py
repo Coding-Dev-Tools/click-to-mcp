@@ -3,7 +3,11 @@
 from __future__ import annotations
 
 import json
+import json
+import pytest
+from click.testing import CliRunner
 from click_to_mcp.adapter import cli_to_mcp_tools
+from click_to_mcp.cli import cli
 from click_to_mcp.demo import cli as demo_cli
 
 
@@ -65,3 +69,47 @@ class TestListToolsAdapter:
         tools = cli_to_mcp_tools(demo_cli, prefix="myprefix")
         for tool in tools:
             assert tool.name.startswith("myprefix_"), f"Tool '{tool.name}' missing prefix"
+
+
+class TestListToolsCli:
+    """CLI-level tests for the list-tools command using CliRunner."""
+
+    @pytest.fixture()
+    def runner(self) -> CliRunner:
+        return CliRunner()
+
+    def test_list_tools_with_valid_name(self, runner: CliRunner) -> None:
+        """list-tools with a known CLI name should exit 0 and show tool info."""
+        result = runner.invoke(cli, ["list-tools", "click-to-mcp-demo"])
+        assert result.exit_code == 0
+        assert "Found 4 MCP tool(s)" in result.output
+        assert "click_to_mcp_demo_greet" in result.output
+        assert "click_to_mcp_demo_calculate" in result.output
+
+    def test_list_tools_no_name_fails(self, runner: CliRunner) -> None:
+        """list-tools with no CLI name or --all should exit with error."""
+        result = runner.invoke(cli, ["list-tools"])
+        assert result.exit_code != 0
+        assert "Error" in result.output
+
+    def test_list_tools_invalid_name_fails(self, runner: CliRunner) -> None:
+        """list-tools with a non-existent CLI name should exit with error."""
+        result = runner.invoke(cli, ["list-tools", "nonexistent-cli-xyz"])
+        assert result.exit_code != 0
+        assert "not found" in result.output.lower()
+
+    def test_list_tools_json_output(self, runner: CliRunner) -> None:
+        """list-tools with --json-output should produce valid JSON."""
+        result = runner.invoke(cli, ["list-tools", "click-to-mcp-demo", "--json-output"])
+        assert result.exit_code == 0
+        parsed = json.loads(result.output)
+        assert isinstance(parsed, list)
+        assert len(parsed) == 4
+        assert parsed[0]["name"] == "click_to_mcp_demo_greet"
+        assert "input_schema" in parsed[0]
+
+    def test_list_tools_json_output_invalid_name(self, runner: CliRunner) -> None:
+        """list-tools --json-output with invalid name should still fail gracefully."""
+        result = runner.invoke(cli, ["list-tools", "nonexistent", "--json-output"])
+        assert result.exit_code != 0
+        assert "not found" in result.output.lower()

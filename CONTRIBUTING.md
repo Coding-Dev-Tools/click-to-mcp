@@ -8,14 +8,16 @@ Thanks for your interest in contributing!
 2. Create a virtual environment: python -m venv .venv && source .venv/bin/activate
 3. Install dev dependencies: pip install -e ".[dev]"
 4. Run tests: pytest tests/ -v
-5. Lint: uff check src/
+5. Lint: 
+ruff check src/
 
 ## Pull Requests
 
 - Fork the repo and create a feature branch
 - Add tests for any new functionality
 - Ensure all existing tests pass
-- Run uff check src/ --fix before committing
+- Run 
+ruff check src/ --fix before committing
 - Keep PRs focused on a single change
 
 ## Reporting Issues
