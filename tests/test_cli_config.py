@@ -7,8 +7,10 @@ and edge cases like --all and --copy flags.
 from __future__ import annotations
 
 import json
+
 import pytest
 from click.testing import CliRunner
+
 from click_to_mcp.cli import cli
 
 
@@ -133,3 +135,26 @@ class TestConfigCli:
         parsed = json.loads(result.stdout)
         svr = parsed["mcpServers"]["click-to-mcp-demo"]
         assert "url" in svr
+
+    def test_config_copy_falls_back_to_stdout(self, runner: CliRunner) -> None:
+        """Config --copy should either copy to clipboard or fall back to stdout."""
+        result = runner.invoke(cli, ["config", "click-to-mcp-demo", "--copy"])
+        assert result.exit_code == 0
+        # On Windows, 'clip' succeeds and prints success message.
+        # On CI (Linux without xclip), it falls back to JSON on stdout.
+        if "copied to clipboard" in result.stdout.lower():
+            # Clipboard succeeded — verify stderr has instructions
+            assert "Add this to your" in result.stderr
+        else:
+            # Fallback path — stdout should contain valid JSON
+            parsed = json.loads(result.stdout)
+            assert "mcpServers" in parsed
+
+    def test_config_http_transport_stderr_note(self, runner: CliRunner) -> None:
+        """Config with HTTP transport should include server-start note on stderr."""
+        result = runner.invoke(cli, [
+            "config", "click-to-mcp-demo",
+            "--transport", "http",
+        ])
+        assert result.exit_code == 0
+        assert "serve-http" in result.stderr
