@@ -385,7 +385,7 @@ Then agents can use it as: `your-cli mcp`
 git clone https://github.com/Coding-Dev-Tools/click-to-mcp
 cd click-to-mcp
 pip install -e ".[dev,http]"
-python -m pytest tests/ -v          # 68 tests (29 stdio + 28 HTTP + 11 Streamable HTTP)
+python -m pytest tests/ -v          # 100+ tests covering adapter, server, HTTP, config, and CLI
 click-to-mcp demo                    # starts MCP stdio server for demo CLI
 click-to-mcp demo-http               # starts MCP HTTP+SSE server on port 8000
 ```
