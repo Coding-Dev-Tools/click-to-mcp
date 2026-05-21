@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from click_to_mcp._version import __version__
 from click_to_mcp.demo import cli as demo_cli
 from click_to_mcp.server import serve_stdio
 from io import StringIO
@@ -127,3 +128,14 @@ class TestStdioServer:
         call = next(r for r in responses if r["id"] == 3)
         assert call["result"]["isError"] is False
         assert "5" in call["result"]["content"][0]["text"]
+
+    # -- version consistency -------------------------------------------------
+
+    def test_initialize_reports_package_version(self) -> None:
+        """The stdio server must report the actual package version, not a hardcoded string."""
+        responses = self._run([_jsonrpc("initialize")])
+        server_version = responses[0]["result"]["serverInfo"]["version"]
+        assert server_version == __version__, (
+            f"stdio server reports version {server_version!r}, "
+            f"but package version is {__version__!r}"
+        )
