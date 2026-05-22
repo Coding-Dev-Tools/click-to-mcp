@@ -138,6 +138,12 @@ def serve_http_streamable(
                         _make_jsonrpc_response(req_id, result)
                     )
 
+                elif method == "ping":
+                    # MCP spec: respond with empty result
+                    responses.append(
+                        _make_jsonrpc_response(req_id, {})
+                    )
+
                 elif method == "notifications/initialized":
                     # No response needed for notifications
                     pass

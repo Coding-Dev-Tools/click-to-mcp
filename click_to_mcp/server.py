@@ -130,6 +130,12 @@ def serve_stdio(
                 sys.stdout.write(response + "\n")
                 sys.stdout.flush()
 
+            elif method == "ping":
+                # MCP spec: respond with empty result
+                response = _make_jsonrpc_response(req_id, {})
+                sys.stdout.write(response + "\n")
+                sys.stdout.flush()
+
             elif method == "notifications/initialized":
                 # No response needed for notifications
                 pass

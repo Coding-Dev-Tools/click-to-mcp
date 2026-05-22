@@ -13,7 +13,14 @@ import pytest
 
 from click_to_mcp.adapter import CliToolDef, cli_to_mcp_tools
 from click_to_mcp.demo import cli as demo_cli
-from click_to_mcp.discover import DiscoveredCLI, find_our_clis, import_cli, scan_entry_points
+from click_to_mcp.discover import (
+    DiscoveredCLI,
+    _get_package_metadata,
+    find_our_clis,
+    import_cli,
+    load_cli,
+    scan_entry_points,
+)
 
 # ---------------------------------------------------------------------------
 # TestAdapter — unit tests for cli_to_mcp_tools with the demo CLI
@@ -268,6 +275,23 @@ class TestDiscover:
             assert cli_obj is not None, f"CLI '{name}' resolved to None"
             # Should be a click.Group or have registered_commands (typer)
             assert hasattr(cli_obj, "commands") or hasattr(cli_obj, "registered_commands")
+
+    # -- edge case coverage for discover.py ----------------------------------
+
+    def test_get_package_metadata_nonexistent(self) -> None:
+        """_get_package_metadata should return '' for non-existent packages (except path)."""
+        result = _get_package_metadata("this-package-definitely-does-not-exist-xyzzy")
+        assert result == ""
+
+    def test_load_cli_nonexistent(self) -> None:
+        """load_cli should return None for unknown CLI names."""
+        result = load_cli("this-cli-definitely-does-not-exist")
+        assert result is None
+
+    def test_import_cli_malformed_module(self) -> None:
+        """import_cli should return None for import errors (except clause)."""
+        result = import_cli("this_module_does_not_exist_at_all!@#", "attr")
+        assert result is None
 
 
 # ---------------------------------------------------------------------------

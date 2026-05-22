@@ -215,6 +215,25 @@ class TestHTTPNotification:
         assert resp.status_code == 204
 
 
+class TestHTTPPing:
+    """Test the MCP ping method over HTTP+SSE."""
+
+    def test_ping_returns_empty_result(self, http_server, base_url: str) -> None:
+        """MCP ping must return an empty result object."""
+        msg = {
+            "jsonrpc": "2.0",
+            "id": 99,
+            "method": "ping",
+            "params": {},
+        }
+        resp = httpx.post(f"{base_url}/messages", json=msg)
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["id"] == 99
+        assert data["result"] == {}
+        assert "error" not in data
+
+
 class TestSSEEndpoint:
     """Test the SSE endpoint returns proper event."""
 
