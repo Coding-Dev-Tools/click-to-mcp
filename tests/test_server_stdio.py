@@ -110,6 +110,17 @@ class TestStdioServer:
         assert len(responses) == 1
         assert responses[0]["id"] == 1
 
+    # -- ping -----------------------------------------------------------------
+
+    def test_ping_returns_empty_result(self) -> None:
+        """MCP ping method must return an empty result object."""
+        responses = self._run([_jsonrpc("ping")])
+        assert len(responses) == 1
+        r = responses[0]
+        assert r["id"] == 1
+        assert r["result"] == {}
+        assert "error" not in r
+
     # -- multiple requests in sequence ----------------------------------------
 
     def test_full_mcp_handshake_and_tool_call(self) -> None:

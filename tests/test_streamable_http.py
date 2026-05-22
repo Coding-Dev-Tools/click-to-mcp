@@ -241,6 +241,38 @@ class TestNotification:
         assert resp.status_code == 204
 
 
+class TestPing:
+    """Test the MCP ping method over Streamable HTTP."""
+
+    def test_ping_returns_empty_result(self, streamable_server, base_url: str) -> None:
+        """MCP ping must return an empty result object."""
+        msg = {
+            "jsonrpc": "2.0",
+            "id": 99,
+            "method": "ping",
+            "params": {},
+        }
+        resp = httpx.post(f"{base_url}/message", json=msg)
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["id"] == 99
+        assert data["result"] == {}
+        assert "error" not in data
+
+    def test_ping_in_batch(self, streamable_server, base_url: str) -> None:
+        """Ping should work correctly in a batch request."""
+        msgs = [
+            {"jsonrpc": "2.0", "id": 50, "method": "ping", "params": {}},
+            {"jsonrpc": "2.0", "id": 51, "method": "tools/list", "params": {}},
+        ]
+        resp = httpx.post(f"{base_url}/message", json=msgs)
+        assert resp.status_code == 200
+        data = resp.json()
+        assert isinstance(data, list)
+        ping_resp = next(r for r in data if r["id"] == 50)
+        assert ping_resp["result"] == {}
+
+
 # ---------------------------------------------------------------------------
 # Batch messages
 # ---------------------------------------------------------------------------
