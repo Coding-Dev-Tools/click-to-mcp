@@ -49,6 +49,12 @@ Changelog = "https://github.com/Coding-Dev-Tools/click-to-mcp/blob/master/CHANGE
 click-to-mcp = "click_to_mcp.cli:main"
 click-to-mcp-demo = "click_to_mcp.demo:cli"
 
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.package-data]
+click_to_mcp = ["py.typed"]
+
 [tool.setuptools.packages.find]
 include = ["click_to_mcp*"]
 

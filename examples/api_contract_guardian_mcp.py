@@ -22,6 +22,7 @@ Then configure your MCP client (e.g. Claude Code):
 """
 
 import click
+
 from click_to_mcp import run
 
 # --- Mock api-contract-guardian CLI (replace with real import) ---

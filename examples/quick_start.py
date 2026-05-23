@@ -8,6 +8,7 @@ Usage:
 """
 
 import click
+
 from click_to_mcp import run
 
 
