@@ -1,6 +1,12 @@
 ---
 name: click-to-mcp
 description: Auto-wrap any Click or typer Python CLI as an MCP server with zero code changes. Use this skill whenever the user wants to expose a CLI tool to an AI agent via MCP, needs to convert a Click/typer app into an MCP server, wants to run an existing CLI through an LLM, or asks about bridging command-line tools and AI agents. Also use when the user mentions MCP server creation from CLIs, CLI-to-MCP conversion, or making Python tools AI-accessible.
+license: Apache-2.0
+compatibility: Requires Python 3.10+ and click or typer. Install via pip, uvx, or npm.
+metadata:
+  author: Coding-Dev-Tools
+  version: "1.0"
+  repository: "https://github.com/Coding-Dev-Tools/click-to-mcp"
 ---
 
 # click-to-mcp: Turn CLIs into MCP Servers
@@ -127,7 +133,12 @@ CLI options that accept `envvar` are supported. The MCP tool will accept the opt
 - File-path options are passed as strings; the server does not validate file existence
 - Commands with `is_eager=True` options may behave differently when called as MCP tools
 
+## Scripts
+
+- [`discover`](./scripts/discover) — Scan installed Python packages for Click/typer CLIs
+- [`serve`](./scripts/serve) — Serve a CLI as an MCP server (stdio transport)
+
 ## Reference Files
 
-- [📋 CLI Discovery Guide](./references/discovery-guide.md) — How discover scans and identifies CLIs
-- [🔌 MCP Transport Details](./references/transports.md) — Deep dive into stdio, SSE, and Streamable HTTP modes
+- [CLI Discovery Guide](./references/discovery-guide.md) — How discover scans and identifies CLIs
+- [MCP Transport Details](./references/transports.md) — Deep dive into stdio, SSE, and Streamable HTTP modes

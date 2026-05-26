@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# Serve a Click/typer CLI as an MCP server (stdio transport)
+# Usage: ./serve <package.module:cli_object>
+set -euo pipefail
+
+CLI_PATH="${1:?Usage: ./serve <package.module:cli_object>}"
+shift
+
+if command -v uvx &>/dev/null; then
+  uvx click-to-mcp serve "$CLI_PATH" "$@"
+elif command -v pipx &>/dev/null; then
+  pipx run click-to-mcp serve "$CLI_PATH" "$@"
+elif command -v click-to-mcp &>/dev/null; then
+  click-to-mcp serve "$CLI_PATH" "$@"
+else
+  pip install click-to-mcp && click-to-mcp serve "$CLI_PATH" "$@"
+fi
