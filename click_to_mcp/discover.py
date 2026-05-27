@@ -58,11 +58,11 @@ def scan_entry_points() -> list[DiscoveredCLI]:
     """
     discovered: list[DiscoveredCLI] = []
 
-    try:
-        eps = entry_points(group="console_scripts")
-    except TypeError:
-        # Older Python: entry_points() returns dict
-        eps = entry_points().get("console_scripts", [])
+    eps_all = entry_points()
+    if hasattr(eps_all, "select"):
+        eps = list(eps_all.select(group="console_scripts"))
+    else:
+        eps = eps_all.get("console_scripts", [])  # type: ignore[attr-defined]
 
     for entry_point in eps:
         try:
@@ -100,10 +100,11 @@ def load_cli(cli_name: str) -> Any | None:
     Returns:
         The loaded Click Group/Command/Typer app, or None if not found.
     """
-    try:
-        eps = entry_points(group="console_scripts")
-    except TypeError:
-        eps = entry_points().get("console_scripts", [])
+    eps_all = entry_points()
+    if hasattr(eps_all, "select"):
+        eps = list(eps_all.select(group="console_scripts"))
+    else:
+        eps = eps_all.get("console_scripts", [])  # type: ignore[attr-defined]
 
     for entry_point in eps:
         if entry_point.name == cli_name:
@@ -145,10 +146,11 @@ def find_our_clis() -> dict[str, Any]:
         Dict of {cli_name: click_or_typer_app} for our projects.
     """
     result: dict[str, Any] = {}
-    try:
-        eps = entry_points(group="console_scripts")
-    except TypeError:
-        eps = entry_points().get("console_scripts", [])
+    eps_all = entry_points()
+    if hasattr(eps_all, "select"):
+        eps = list(eps_all.select(group="console_scripts"))
+    else:
+        eps = eps_all.get("console_scripts", [])  # type: ignore[attr-defined]
 
     our_modules = [
         "api_contract_guardian", "json2sql", "deploydiff", "configdrift",

@@ -65,7 +65,7 @@ def _build_click_tool_def(cmd: click.Command, prefix: str = "") -> CliToolDef | 
 
     Returns None if the command has subcommands (handled recursively).
     """
-    full_name = f"{prefix}_{cmd.name}".strip("_") if prefix else cmd.name
+    full_name = f"{prefix}_{cmd.name}".strip("_") if prefix else (cmd.name or "")
 
     if isinstance(cmd, click.Group):
         return None

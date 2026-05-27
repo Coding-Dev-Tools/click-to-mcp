@@ -131,7 +131,7 @@ def serve_http(
                 return JSONResponse(_make_jsonrpc_response(req_id, result))
 
             elif method == "tools/list":
-                result = {"tools": mcp_tool_list}
+                result = {"tools": mcp_tool_list}  # type: ignore[dict-item, list-item]
                 return JSONResponse(_make_jsonrpc_response(req_id, result))
 
             elif method == "tools/call":
@@ -150,23 +150,23 @@ def serve_http(
                     output = tool.handler(**arguments)
                     result = {
                         "content": [
-                            {
+                            {  # type: ignore[dict-item, list-item]
                                 "type": "text",
                                 "text": output,
                             }
                         ],
-                        "isError": False,
+                        "isError": False,  # type: ignore[dict-item, list-item]
                     }
                     return JSONResponse(_make_jsonrpc_response(req_id, result))
                 except Exception as e:
                     result = {
                         "content": [
-                            {
+                            {  # type: ignore[dict-item, list-item]
                                 "type": "text",
                                 "text": f"Error: {e}\n{traceback.format_exc()}",
                             }
                         ],
-                        "isError": True,
+                        "isError": True,  # type: ignore[dict-item, list-item]
                     }
                     return JSONResponse(_make_jsonrpc_response(req_id, result))
 

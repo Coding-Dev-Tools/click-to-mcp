@@ -79,13 +79,13 @@ def serve(name: str | None, serve_all: bool):
         serve_stdio(target_cli, name=clis[0].name)
         return
 
-    target_cli = load_cli(name)
+    target_cli = load_cli(name or "")
     if target_cli is None:
         click.echo(f"Error: CLI '{name}' not found.", err=True)
         click.echo("Run 'click-to-mcp discover' to see available CLIs.", err=True)
         sys.exit(1)
 
-    serve_stdio(target_cli, name=name)
+    serve_stdio(target_cli, name=name or "")
 
 
 @cli.command()
@@ -123,13 +123,13 @@ def serve_http(name: str | None, host: str, port: int, serve_all: bool):
         _serve_http(target_cli, name=clis[0].name, host=host, port=port)
         return
 
-    target_cli = load_cli(name)
+    target_cli = load_cli(name or "")
     if target_cli is None:
         click.echo(f"Error: CLI '{name}' not found.", err=True)
         click.echo("Run 'click-to-mcp discover' to see available CLIs.", err=True)
         sys.exit(1)
 
-    _serve_http(target_cli, name=name, host=host, port=port)
+    _serve_http(target_cli, name=name or "", host=host, port=port)
 
 
 @cli.command("list-tools")
@@ -163,12 +163,12 @@ def list_tools(name: str | None, list_all: bool, json_output: bool):
             tools = cli_to_mcp_tools(target_cli, prefix=cli_info.name)
             all_tools.extend(tools)
     else:
-        target_cli = load_cli(name)
+        target_cli = load_cli(name or "")
         if target_cli is None:
             click.echo(f"Error: CLI '{name}' not found.", err=True)
             click.echo("Run 'click-to-mcp discover' to see available CLIs.", err=True)
             sys.exit(1)
-        all_tools = cli_to_mcp_tools(target_cli, prefix=name)
+        all_tools = cli_to_mcp_tools(target_cli, prefix=name or "")
 
     if not all_tools:
         click.echo("No MCP tools found for the specified CLI.", err=True)
@@ -260,13 +260,13 @@ def serve_http_streamable(name: str | None, host: str, port: int, serve_all: boo
         _serve(target_cli, name=clis[0].name, host=host, port=port)
         return
 
-    target_cli = load_cli(name)
+    target_cli = load_cli(name or "")
     if target_cli is None:
         click.echo(f"Error: CLI '{name}' not found.", err=True)
         click.echo("Run 'click-to-mcp discover' to see available CLIs.", err=True)
         sys.exit(1)
 
-    _serve(target_cli, name=name, host=host, port=port)
+    _serve(target_cli, name=name or "", host=host, port=port)
 
 
 @cli.command("demo-http-streamable")
@@ -331,12 +331,12 @@ def config(name: str | None, client: str, transport: str, host: str, port: int,
         cli_names = [c.name for c in clis]
     else:
         # Verify the CLI exists
-        target_cli = load_cli(name)
+        target_cli = load_cli(name or "")
         if target_cli is None:
             click.echo(f"Error: CLI '{name}' not found.", err=True)
             click.echo("Run 'click-to-mcp discover' to see available CLIs.", err=True)
             sys.exit(1)
-        cli_names = [name]
+        cli_names = [name or ""]
 
     # Build MCP server configs
     server_configs: dict[str, dict] = {}
