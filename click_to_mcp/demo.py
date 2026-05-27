@@ -4,7 +4,7 @@ import click
 
 
 @click.group()
-def cli():
+def cli() -> None:
     """Demo CLI — a sample application for click-to-mcp testing."""
     pass
 
@@ -36,7 +36,7 @@ def calculate(a: float, b: float, operation: str) -> None:
 
 
 @cli.group()
-def config():
+def config() -> None:
     """Manage configuration."""
     pass
 

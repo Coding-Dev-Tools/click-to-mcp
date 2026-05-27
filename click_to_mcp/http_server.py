@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import json
 import traceback
-from typing import Any
+from typing import Any, AsyncGenerator
 
 from ._version import __version__
 from .adapter import CliToolDef, cli_to_mcp_tools
@@ -96,7 +96,7 @@ def serve_http(
 
     async def handle_sse(request: Request) -> EventSourceResponse:
         """SSE endpoint for server-to-client messages."""
-        async def event_generator():
+        async def event_generator() -> AsyncGenerator:
             yield {
                 "event": "endpoint",
                 "data": "/messages?session_id=default",
