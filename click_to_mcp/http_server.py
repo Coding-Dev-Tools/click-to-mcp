@@ -11,7 +11,8 @@ from __future__ import annotations
 
 import json
 import traceback
-from typing import Any, AsyncGenerator
+from collections.abc import AsyncGenerator
+from typing import Any
 
 from ._version import __version__
 from .adapter import CliToolDef, cli_to_mcp_tools
