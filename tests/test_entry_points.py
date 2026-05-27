@@ -10,7 +10,6 @@ import sys
 from unittest.mock import patch
 
 import click
-import pytest
 
 
 class TestMainModule:
