@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# Discover Click/typer CLIs installed in the current Python environment
+# Usage: ./discover [package_name]
+set -euo pipefail
+
+if command -v uvx &>/dev/null; then
+  uvx click-to-mcp discover "$@"
+elif command -v pipx &>/dev/null; then
+  pipx run click-to-mcp discover "$@"
+elif command -v click-to-mcp &>/dev/null; then
+  click-to-mcp discover "$@"
+else
+  pip install click-to-mcp && click-to-mcp discover "$@"
+fi

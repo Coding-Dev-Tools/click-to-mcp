@@ -1,0 +1,6 @@
+{
+  "click-to-mcp": {
+    "command": "uvx",
+    "args": ["click-to-mcp", "demo"]
+  }
+}

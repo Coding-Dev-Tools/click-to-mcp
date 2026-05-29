@@ -21,13 +21,13 @@ from .discover import load_cli, scan_entry_points
 
 @click.group()
 @click.version_option(version=__version__, prog_name="click-to-mcp")
-def cli():
+def cli() -> None:
     """Auto-wrap any Click/typer CLI as an MCP (Model Context Protocol) server."""
     pass
 
 
 @cli.command()
-def discover():
+def discover() -> None:
     """List all installed Click/typer CLIs that can be served as MCP tools."""
     clis = scan_entry_points()
 
@@ -55,7 +55,7 @@ def discover():
 @cli.command()
 @click.argument("name", required=False, default=None)
 @click.option("--all", "serve_all", is_flag=True, help="Serve all discoverable CLIs")
-def serve(name: str | None, serve_all: bool):
+def serve(name: str | None, serve_all: bool) -> None:
     """Serve a CLI as an MCP server over stdio.
 
     Specify a CLI NAME from 'click-to-mcp discover', or use --all.
@@ -79,13 +79,13 @@ def serve(name: str | None, serve_all: bool):
         serve_stdio(target_cli, name=clis[0].name)
         return
 
-    target_cli = load_cli(name)
+    target_cli = load_cli(name or "")
     if target_cli is None:
         click.echo(f"Error: CLI '{name}' not found.", err=True)
         click.echo("Run 'click-to-mcp discover' to see available CLIs.", err=True)
         sys.exit(1)
 
-    serve_stdio(target_cli, name=name)
+    serve_stdio(target_cli, name=name or "")
 
 
 @cli.command()
@@ -93,7 +93,7 @@ def serve(name: str | None, serve_all: bool):
 @click.option("--host", default="127.0.0.1", help="Host to bind (default: 127.0.0.1)")
 @click.option("--port", default=8000, type=int, help="Port to bind (default: 8000)")
 @click.option("--all", "serve_all", is_flag=True, help="Serve all discoverable CLIs")
-def serve_http(name: str | None, host: str, port: int, serve_all: bool):
+def serve_http(name: str | None, host: str, port: int, serve_all: bool) -> None:
     """Serve a CLI as an MCP server over HTTP+SSE.
 
     Specify a CLI NAME from 'click-to-mcp discover', or use --all.
@@ -123,20 +123,20 @@ def serve_http(name: str | None, host: str, port: int, serve_all: bool):
         _serve_http(target_cli, name=clis[0].name, host=host, port=port)
         return
 
-    target_cli = load_cli(name)
+    target_cli = load_cli(name or "")
     if target_cli is None:
         click.echo(f"Error: CLI '{name}' not found.", err=True)
         click.echo("Run 'click-to-mcp discover' to see available CLIs.", err=True)
         sys.exit(1)
 
-    _serve_http(target_cli, name=name, host=host, port=port)
+    _serve_http(target_cli, name=name or "", host=host, port=port)
 
 
 @cli.command("list-tools")
 @click.argument("name", required=False, default=None)
 @click.option("--all", "list_all", is_flag=True, help="List tools from all discoverable CLIs")
 @click.option("--json-output", "-j", is_flag=True, help="Output as JSON (for scripting/CI)")
-def list_tools(name: str | None, list_all: bool, json_output: bool):
+def list_tools(name: str | None, list_all: bool, json_output: bool) -> None:
     """List the MCP tools that would be exposed from a CLI.
 
     Shows tool names, descriptions, and parameter schemas without starting
@@ -163,12 +163,12 @@ def list_tools(name: str | None, list_all: bool, json_output: bool):
             tools = cli_to_mcp_tools(target_cli, prefix=cli_info.name)
             all_tools.extend(tools)
     else:
-        target_cli = load_cli(name)
+        target_cli = load_cli(name or "")
         if target_cli is None:
             click.echo(f"Error: CLI '{name}' not found.", err=True)
             click.echo("Run 'click-to-mcp discover' to see available CLIs.", err=True)
             sys.exit(1)
-        all_tools = cli_to_mcp_tools(target_cli, prefix=name)
+        all_tools = cli_to_mcp_tools(target_cli, prefix=name or "")
 
     if not all_tools:
         click.echo("No MCP tools found for the specified CLI.", err=True)
@@ -199,7 +199,7 @@ def list_tools(name: str | None, list_all: bool, json_output: bool):
 
 
 @cli.command()
-def demo():
+def demo() -> None:
     """Run the built-in demo CLI as an MCP server (stdio)."""
     from .demo import cli as demo_cli
 
@@ -209,7 +209,7 @@ def demo():
 @cli.command("demo-http")
 @click.option("--host", default="127.0.0.1", help="Host to bind (default: 127.0.0.1)")
 @click.option("--port", default=8000, type=int, help="Port to bind (default: 8000)")
-def demo_http(host: str, port: int):
+def demo_http(host: str, port: int) -> None:
     """Run the built-in demo CLI as an HTTP+SSE MCP server.
 
     Requires optional HTTP dependencies: pip install 'click-to-mcp[http]'
@@ -230,7 +230,7 @@ def demo_http(host: str, port: int):
 @click.option("--host", default="127.0.0.1", help="Host to bind (default: 127.0.0.1)")
 @click.option("--port", default=8001, type=int, help="Port to bind (default: 8001)")
 @click.option("--all", "serve_all", is_flag=True, help="Serve all discoverable CLIs")
-def serve_http_streamable(name: str | None, host: str, port: int, serve_all: bool):
+def serve_http_streamable(name: str | None, host: str, port: int, serve_all: bool) -> None:
     """Serve a CLI as an MCP server over Streamable HTTP (no SSE).
 
     Uses a single POST /message endpoint — simpler than HTTP+SSE, compatible
@@ -260,19 +260,19 @@ def serve_http_streamable(name: str | None, host: str, port: int, serve_all: boo
         _serve(target_cli, name=clis[0].name, host=host, port=port)
         return
 
-    target_cli = load_cli(name)
+    target_cli = load_cli(name or "")
     if target_cli is None:
         click.echo(f"Error: CLI '{name}' not found.", err=True)
         click.echo("Run 'click-to-mcp discover' to see available CLIs.", err=True)
         sys.exit(1)
 
-    _serve(target_cli, name=name, host=host, port=port)
+    _serve(target_cli, name=name or "", host=host, port=port)
 
 
 @cli.command("demo-http-streamable")
 @click.option("--host", default="127.0.0.1", help="Host to bind (default: 127.0.0.1)")
 @click.option("--port", default=8001, type=int, help="Port to bind (default: 8001)")
-def demo_http_streamable(host: str, port: int):
+def demo_http_streamable(host: str, port: int) -> None:
     """Run the built-in demo CLI as a Streamable HTTP MCP server (no SSE).
 
     Requires: pip install 'click-to-mcp[http]'
@@ -331,12 +331,12 @@ def config(name: str | None, client: str, transport: str, host: str, port: int,
         cli_names = [c.name for c in clis]
     else:
         # Verify the CLI exists
-        target_cli = load_cli(name)
+        target_cli = load_cli(name or "")
         if target_cli is None:
             click.echo(f"Error: CLI '{name}' not found.", err=True)
             click.echo("Run 'click-to-mcp discover' to see available CLIs.", err=True)
             sys.exit(1)
-        cli_names = [name]
+        cli_names = [name or ""]
 
     # Build MCP server configs
     server_configs: dict[str, dict] = {}
@@ -405,7 +405,7 @@ def config(name: str | None, client: str, transport: str, host: str, port: int,
         click.echo(f"\nNote: Start the server first: click-to-mcp {transport_cmd} {cli_names[0]} --port {port}", err=True)
 
 
-def main():
+def main() -> None:
     """Entry point for the click-to-mcp CLI."""
     cli()
 
