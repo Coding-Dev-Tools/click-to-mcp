@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // npm wrapper for click-to-mcp-demo Python CLI
-const { execSync } = require('child_process');
+const { execSync, spawnSync } = require('child_process');
 
 function getPythonCommand() {
   const commands = ['python3', 'python'];
@@ -28,11 +28,10 @@ function ensureInstalled() {
 
 const pythonCmd = getPythonCommand();
 ensureInstalled();
-try {
-  execSync(`${pythonCmd} -m click_to_mcp.demo ${process.argv.slice(2).join(' ')}`, {
-    stdio: 'inherit',
-    env: { ...process.env }
-  });
-} catch (e) {
-  process.exit(e.status || 1);
-}
+
+const result = spawnSync(pythonCmd, ['-m', 'click_to_mcp.demo', ...process.argv.slice(2)], {
+  stdio: 'inherit',
+  env: { ...process.env }
+});
+process.exit(result.status ?? 0);
+
