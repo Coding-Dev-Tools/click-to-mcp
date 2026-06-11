@@ -1,7 +1,7 @@
 {
   "name": "click-to-mcp",
   "version": "0.5.0",
-  "description": "Auto-wrap any Click/typer CLI as an MCP server \u2014 with auto-discovery, stdio, HTTP+SSE, and Streamable HTTP transport",
+  "description": "Auto-wrap any Click/typer CLI as an MCP server — with auto-discovery, stdio, HTTP+SSE, and Streamable HTTP transport",
   "keywords": [
     "mcp",
     "model-context-protocol",
@@ -44,5 +44,8 @@
   },
   "bugs": {
     "url": "https://github.com/Coding-Dev-Tools/click-to-mcp/issues"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
