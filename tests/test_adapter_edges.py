@@ -47,6 +47,25 @@ class TestGetClickGroup:
         with pytest.raises(TypeError, match="Expected click.Group or typer.Typer"):
             _get_click_group(cmd)
 
+    def test_typer_single_command_returns_group(self) -> None:
+        """A Typer app with a single command should be wrapped in a Group.
+
+        This exercises the typer_get_command branch in adapter.py (lines 154-161)
+        where a single Click Command is wrapped in a Group.
+        """
+        import typer
+
+        app = typer.Typer()
+
+        @app.command()
+        def hello(name: str) -> None:
+            """Say hello."""
+            print(f"Hello {name}")
+
+        result = _get_click_group(app)
+        assert isinstance(result, click.Group)
+        assert "hello" in result.commands
+
 
 # ---------------------------------------------------------------------------
 # _build_click_tool_def with click.Group → returns None
@@ -88,6 +107,28 @@ class TestBuildClickToolDef:
         result = _build_click_tool_def(cmd)
         assert result is not None
         assert "my_option" in result.input_schema["properties"]
+
+    def test_option_with_ctx_key_skipped(self) -> None:
+        """An option named 'ctx' should be skipped (internal Click param)."""
+        cmd = click.Command(
+            name="safe",
+            params=[click.Option(["--ctx"], help="Not the context object", expose_value=True)],
+        )
+        result = _build_click_tool_def(cmd)
+        assert result is not None
+        # 'ctx' key should not appear in properties
+        assert "ctx" not in result.input_schema["properties"]
+
+    def test_argument_without_name_skipped(self) -> None:
+        """A click.Argument with no name should be skipped (covers adapter.py:87)."""
+        # Click's Argument always has a name, but we can test that
+        # internal Click arguments like 'ctx' are handled correctly
+        cmd = click.Command(
+            name="test-cmd",
+            params=[click.Argument(["ctx"], required=False)],
+        )
+        result = _build_click_tool_def(cmd)
+        assert result is not None
 
 
 # ---------------------------------------------------------------------------

@@ -39,6 +39,9 @@
     "darwin",
     "win32"
   ],
+  "scripts": {
+    "test": "node tests/test_cli_wrapper.js"
+  },
   "bugs": {
     "url": "https://github.com/Coding-Dev-Tools/click-to-mcp/issues"
   },
