@@ -13,6 +13,21 @@ from click_to_mcp._version import __version__
 from click_to_mcp.demo import cli as demo_cli
 
 # ---------------------------------------------------------------------------
+# httpx client fixture — trust_env=False so proxy env vars (ALL_PROXY,
+# HTTP_PROXY, etc.) are ignored for loopback connections.  Without this
+# httpx routes 127.0.0.1 through whatever proxy the environment declares,
+# which breaks tests in corporate / sandbox environments with proxy settings.
+# ---------------------------------------------------------------------------
+
+
+@pytest.fixture(scope="module")
+def client() -> Generator[httpx.Client, None, None]:
+    """Module-scoped httpx client that bypasses environment proxy settings."""
+    with httpx.Client(trust_env=False) as c:
+        yield c
+
+
+# ---------------------------------------------------------------------------
 # TestStreamableHTTP — integration tests via HTTP client
 # ---------------------------------------------------------------------------
 
@@ -28,17 +43,21 @@ def _start_server(port: int = 9877) -> Generator[None, None, None]:
         daemon=True,
     )
     thread.start()
-    # Wait for server to be ready
-    for _ in range(20):
-        try:
-            resp = httpx.get(f"http://127.0.0.1:{port}/health", timeout=1)
-            if resp.status_code == 200:
-                break
-        except Exception:
-            pass
-        time.sleep(0.25)
-    else:
-        pytest.fail("Streamable HTTP server did not start within 5 seconds")
+    # Wait for server to be ready — use a proxy-free client for the poll loop
+    _poll_client = httpx.Client(trust_env=False)
+    try:
+        for _ in range(20):
+            try:
+                resp = _poll_client.get(f"http://127.0.0.1:{port}/health", timeout=1)
+                if resp.status_code == 200:
+                    break
+            except Exception:
+                pass
+            time.sleep(0.25)
+        else:
+            pytest.fail("Streamable HTTP server did not start within 5 seconds")
+    finally:
+        _poll_client.close()
     yield
     # Thread is daemon, will be cleaned up
 
@@ -62,8 +81,8 @@ def base_url() -> str:
 class TestHealth:
     """Test the health check endpoint."""
 
-    def test_health_returns_ok(self, streamable_server, base_url: str) -> None:
-        resp = httpx.get(f"{base_url}/health")
+    def test_health_returns_ok(self, streamable_server, base_url: str, client: httpx.Client) -> None:
+        resp = client.get(f"{base_url}/health")
         assert resp.status_code == 200
         data = resp.json()
         assert data["status"] == "ok"
@@ -80,14 +99,14 @@ class TestHealth:
 class TestInitialize:
     """Test MCP initialize handshake."""
 
-    def test_initialize(self, streamable_server, base_url: str) -> None:
+    def test_initialize(self, streamable_server, base_url: str, client: httpx.Client) -> None:
         msg = {
             "jsonrpc": "2.0",
             "id": 1,
             "method": "initialize",
             "params": {},
         }
-        resp = httpx.post(f"{base_url}/message", json=msg)
+        resp = client.post(f"{base_url}/message", json=msg)
         assert resp.status_code == 200
         data = resp.json()
         assert data["id"] == 1
@@ -97,7 +116,7 @@ class TestInitialize:
         assert "tools" in result["capabilities"]
         assert "streamableHttp" in result["capabilities"]
 
-    def test_initialize_reports_package_version(self, streamable_server, base_url: str) -> None:
+    def test_initialize_reports_package_version(self, streamable_server, base_url: str, client: httpx.Client) -> None:
         """The streamable HTTP server must report the actual package version."""
         msg = {
             "jsonrpc": "2.0",
@@ -105,7 +124,7 @@ class TestInitialize:
             "method": "initialize",
             "params": {},
         }
-        resp = httpx.post(f"{base_url}/message", json=msg)
+        resp = client.post(f"{base_url}/message", json=msg)
         assert resp.status_code == 200
         server_version = resp.json()["result"]["serverInfo"]["version"]
         assert server_version == __version__, (
@@ -122,14 +141,14 @@ class TestInitialize:
 class TestToolsList:
     """Test tools/list."""
 
-    def test_tools_list(self, streamable_server, base_url: str) -> None:
+    def test_tools_list(self, streamable_server, base_url: str, client: httpx.Client) -> None:
         msg = {
             "jsonrpc": "2.0",
             "id": 2,
             "method": "tools/list",
             "params": {},
         }
-        resp = httpx.post(f"{base_url}/message", json=msg)
+        resp = client.post(f"{base_url}/message", json=msg)
         assert resp.status_code == 200
         data = resp.json()
         tools = data["result"]["tools"]
@@ -147,7 +166,7 @@ class TestToolsList:
 class TestToolsCall:
     """Test tools/call."""
 
-    def test_call_greet(self, streamable_server, base_url: str) -> None:
+    def test_call_greet(self, streamable_server, base_url: str, client: httpx.Client) -> None:
         msg = {
             "jsonrpc": "2.0",
             "id": 3,
@@ -157,7 +176,7 @@ class TestToolsCall:
                 "arguments": {"name": "World", "greeting": "Hi", "repeat": 1},
             },
         }
-        resp = httpx.post(f"{base_url}/message", json=msg)
+        resp = client.post(f"{base_url}/message", json=msg)
         assert resp.status_code == 200
         data = resp.json()
         result = data["result"]
@@ -165,7 +184,7 @@ class TestToolsCall:
         text = result["content"][0]["text"]
         assert "Hi, World!" in text
 
-    def test_call_calculate(self, streamable_server, base_url: str) -> None:
+    def test_call_calculate(self, streamable_server, base_url: str, client: httpx.Client) -> None:
         msg = {
             "jsonrpc": "2.0",
             "id": 4,
@@ -175,7 +194,7 @@ class TestToolsCall:
                 "arguments": {"a": 10, "b": 3, "operation": "mul"},
             },
         }
-        resp = httpx.post(f"{base_url}/message", json=msg)
+        resp = client.post(f"{base_url}/message", json=msg)
         assert resp.status_code == 200
         data = resp.json()
         result = data["result"]
@@ -183,7 +202,7 @@ class TestToolsCall:
         text = result["content"][0]["text"]
         assert "30.0" in text
 
-    def test_unknown_tool_returns_error(self, streamable_server, base_url: str) -> None:
+    def test_unknown_tool_returns_error(self, streamable_server, base_url: str, client: httpx.Client) -> None:
         msg = {
             "jsonrpc": "2.0",
             "id": 5,
@@ -193,27 +212,27 @@ class TestToolsCall:
                 "arguments": {},
             },
         }
-        resp = httpx.post(f"{base_url}/message", json=msg)
+        resp = client.post(f"{base_url}/message", json=msg)
         assert resp.status_code == 200
         data = resp.json()
         assert "error" in data
         assert data["error"]["code"] == -32602
 
-    def test_unknown_method_returns_error(self, streamable_server, base_url: str) -> None:
+    def test_unknown_method_returns_error(self, streamable_server, base_url: str, client: httpx.Client) -> None:
         msg = {
             "jsonrpc": "2.0",
             "id": 6,
             "method": "nonexistent/method",
             "params": {},
         }
-        resp = httpx.post(f"{base_url}/message", json=msg)
+        resp = client.post(f"{base_url}/message", json=msg)
         assert resp.status_code == 200
         data = resp.json()
         assert "error" in data
         assert data["error"]["code"] == -32601
 
-    def test_invalid_json_returns_parse_error(self, streamable_server, base_url: str) -> None:
-        resp = httpx.post(
+    def test_invalid_json_returns_parse_error(self, streamable_server, base_url: str, client: httpx.Client) -> None:
+        resp = client.post(
             f"{base_url}/message",
             content="not json",
             headers={"Content-Type": "application/json"},
@@ -231,20 +250,20 @@ class TestToolsCall:
 class TestNotification:
     """Test that notifications return 204."""
 
-    def test_notification_initialized(self, streamable_server, base_url: str) -> None:
+    def test_notification_initialized(self, streamable_server, base_url: str, client: httpx.Client) -> None:
         msg = {
             "jsonrpc": "2.0",
             "method": "notifications/initialized",
             "params": {},
         }
-        resp = httpx.post(f"{base_url}/message", json=msg)
+        resp = client.post(f"{base_url}/message", json=msg)
         assert resp.status_code == 204
 
 
 class TestPing:
     """Test the MCP ping method over Streamable HTTP."""
 
-    def test_ping_returns_empty_result(self, streamable_server, base_url: str) -> None:
+    def test_ping_returns_empty_result(self, streamable_server, base_url: str, client: httpx.Client) -> None:
         """MCP ping must return an empty result object."""
         msg = {
             "jsonrpc": "2.0",
@@ -252,20 +271,20 @@ class TestPing:
             "method": "ping",
             "params": {},
         }
-        resp = httpx.post(f"{base_url}/message", json=msg)
+        resp = client.post(f"{base_url}/message", json=msg)
         assert resp.status_code == 200
         data = resp.json()
         assert data["id"] == 99
         assert data["result"] == {}
         assert "error" not in data
 
-    def test_ping_in_batch(self, streamable_server, base_url: str) -> None:
+    def test_ping_in_batch(self, streamable_server, base_url: str, client: httpx.Client) -> None:
         """Ping should work correctly in a batch request."""
         msgs = [
             {"jsonrpc": "2.0", "id": 50, "method": "ping", "params": {}},
             {"jsonrpc": "2.0", "id": 51, "method": "tools/list", "params": {}},
         ]
-        resp = httpx.post(f"{base_url}/message", json=msgs)
+        resp = client.post(f"{base_url}/message", json=msgs)
         assert resp.status_code == 200
         data = resp.json()
         assert isinstance(data, list)
@@ -281,12 +300,12 @@ class TestPing:
 class TestBatch:
     """Test batch message support."""
 
-    def test_batch_messages(self, streamable_server, base_url: str) -> None:
+    def test_batch_messages(self, streamable_server, base_url: str, client: httpx.Client) -> None:
         msgs = [
             {"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {}},
             {"jsonrpc": "2.0", "id": 2, "method": "tools/list", "params": {}},
         ]
-        resp = httpx.post(f"{base_url}/message", json=msgs)
+        resp = client.post(f"{base_url}/message", json=msgs)
         assert resp.status_code == 200
         data = resp.json()
         assert isinstance(data, list)

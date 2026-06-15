@@ -177,7 +177,7 @@ def serve_http(
                 return JSONResponse(_make_jsonrpc_response(req_id, result))
 
             elif method == "notifications/initialized":
-                return JSONResponse({}, status_code=204)
+                return Response(status_code=204)
 
             else:
                 error = {

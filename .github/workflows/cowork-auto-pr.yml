@@ -1,0 +1,28 @@
+# Seeded by the repo-improver-rotation Cowork job into cowork/improve-* branches.
+# Opens a PR automatically when such a branch is pushed (sandbox cannot reach
+# the GitHub API directly; this runs server-side with the repo's GITHUB_TOKEN).
+name: cowork-auto-pr
+on:
+  push:
+    branches: ['cowork/improve-**']
+permissions:
+  contents: read
+  pull-requests: write
+jobs:
+  ensure-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Open PR for this branch if none exists
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -eu
+          existing=$(gh pr list --repo "$GITHUB_REPOSITORY" --head "$GITHUB_REF_NAME" --state open --json number --jq 'length')
+          if [ "$existing" = "0" ]; then
+            gh pr create --repo "$GITHUB_REPOSITORY" \
+              --head "$GITHUB_REF_NAME" \
+              --title "cowork-bot: automated improvements ($GITHUB_REF_NAME)" \
+              --body "Automated improvement PR from the Cowork repo-improver rotation (one coherent senior-dev improvement per run; see individual commit messages). Subsequent runs push additional commits to this PR rather than opening new ones."
+          else
+            echo "Open PR already exists for $GITHUB_REF_NAME — nothing to do."
+          fi
