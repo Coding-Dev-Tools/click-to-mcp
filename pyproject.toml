@@ -5,11 +5,11 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "click-to-mcp"
 version = "0.5.0"
-description = "Auto-wrap any Click/typer CLI as an MCP (Model Context Protocol) server — with auto-discovery, stdio, HTTP+SSE, and Streamable HTTP transport"
+description = "Auto-wrap any Click/typer CLI as an MCP (Model Context Protocol) server â€” with auto-discovery, stdio, HTTP+SSE, and Streamable HTTP transport"
 readme = "README.md"
 license = { text = "Apache-2.0" }
 authors = [
-    { name = "Revenue Holdings", email = "dev@revenueholdings.dev" },
+    { name = "DevForge", email = "dev@devforge.dev" },
 ]
 requires-python = ">=3.10"
 dependencies = [
