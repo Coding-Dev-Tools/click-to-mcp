@@ -53,7 +53,7 @@ class TestGetClickGroup:
         This exercises the typer_get_command branch in adapter.py (lines 154-161)
         where a single Click Command is wrapped in a Group.
         """
-        import typer
+        typer = pytest.importorskip("typer")
 
         app = typer.Typer()
 
