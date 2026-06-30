@@ -299,7 +299,7 @@ def demo_http_streamable(host: str, port: int) -> None:
     case_sensitive=False,
 ), default="stdio", help="Transport type (default: stdio)")
 @click.option("--host", default="127.0.0.1", help="Host for HTTP transport (default: 127.0.0.1)")
-@click.option("--port", default=8000, type=int, help="Port for HTTP transport (default: 8000)")
+@click.option("--port", default=8000, type=int, help="Port for HTTP transport (default: 8000; streamable-http: 8001)")
 @click.option("--all", "config_all", is_flag=True, help="Generate config for all discoverable CLIs")
 @click.option("--copy", "copy_to_clipboard", is_flag=True, help="Copy to clipboard instead of stdout")
 def config(name: str | None, client: str, transport: str, host: str, port: int,
@@ -357,12 +357,12 @@ def config(name: str | None, client: str, transport: str, host: str, port: int,
 
     # Format output based on client
     client_key = client.lower()
-    if client_key == "claude-desktop" or client_key == "cursor":  # pragma: allowlist secret
+    if client_key == "claude-desktop" or client_key == "cursor":
         output = {"mcpServers": server_configs}
-    elif client_key == "vscode":  # pragma: allowlist secret
+    elif client_key == "vscode":
         # VS Code Copilot uses "inputs" and "servers" at top level
         output = {"mcp": {"servers": server_configs}}
-    elif client_key == "windsurf" or client_key == "cline":  # pragma: allowlist secret
+    elif client_key == "windsurf" or client_key == "cline":
         output = {"mcpServers": server_configs}
     else:
         output = {"mcpServers": server_configs}
