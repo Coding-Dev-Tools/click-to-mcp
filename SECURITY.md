@@ -19,5 +19,5 @@ We aim to respond within 48 hours and will keep you updated on the fix.
 ## Security Best Practices
 
 - Keep your dependencies up to date
-- Use `pip audit` to check for known vulnerabilities
+- Use `pip-audit` to check for known vulnerabilities
 - Report any security concerns promptly

@@ -299,7 +299,7 @@ def demo_http_streamable(host: str, port: int) -> None:
     case_sensitive=False,
 ), default="stdio", help="Transport type (default: stdio)")
 @click.option("--host", default="127.0.0.1", help="Host for HTTP transport (default: 127.0.0.1)")
-@click.option("--port", default=8000, type=int, help="Port for HTTP transport (default: 8000)")
+@click.option("--port", default=8000, type=int, help="Port for HTTP transport (default: 8000; streamable-http: 8001)")
 @click.option("--all", "config_all", is_flag=True, help="Generate config for all discoverable CLIs")
 @click.option("--copy", "copy_to_clipboard", is_flag=True, help="Copy to clipboard instead of stdout")
 def config(name: str | None, client: str, transport: str, host: str, port: int,
@@ -356,13 +356,13 @@ def config(name: str | None, client: str, transport: str, host: str, port: int,
             }
 
     # Format output based on client
-    client_key = client.lower()
-    if client_key == "claude-desktop" or client_key == "cursor":
+    client_norm = client.lower()
+    if client_norm == "claude-desktop" or client_norm == "cursor":
         output = {"mcpServers": server_configs}
-    elif client_key == "vscode":
+    elif client_norm == "vscode":
         # VS Code Copilot uses "inputs" and "servers" at top level
         output = {"mcp": {"servers": server_configs}}
-    elif client_key == "windsurf" or client_key == "cline":
+    elif client_norm == "windsurf" or client_norm == "cline":
         output = {"mcpServers": server_configs}
     else:
         output = {"mcpServers": server_configs}
@@ -372,12 +372,11 @@ def config(name: str | None, client: str, transport: str, host: str, port: int,
     if copy_to_clipboard:
         import subprocess as _sp
         try:
-            if sys.platform == "win32":
-                cmd = ["clip"]
-            elif sys.platform == "darwin":
-                cmd = ["pbcopy"]
-            else:
-                cmd = ["xclip", "-selection", "clipboard"]
+            platform_cmds = {
+                "win32": ["clip"],
+                "darwin": ["pbcopy"],
+            }
+            cmd = platform_cmds.get(sys.platform, ["xclip", "-selection", "clipboard"])
             proc = _sp.Popen(cmd, stdin=_sp.PIPE)
             proc.communicate(output_json.encode())
             if proc.returncode == 0:
@@ -399,7 +398,7 @@ def config(name: str | None, client: str, transport: str, host: str, port: int,
         "cline": "~/.cline/mcp_config.json or via Cline settings",
     }
     click.echo(f"Add this to your {client} config file:", err=True)
-    click.echo(f"  {config_paths.get(client_key, 'client config file')}", err=True)
+    click.echo(f"  {config_paths.get(client_norm, 'client config file')}", err=True)
     if transport != "stdio":
         transport_cmd = "serve-http-streamable" if transport == "streamable-http" else "serve-http"
         click.echo(f"\nNote: Start the server first: click-to-mcp {transport_cmd} {cli_names[0]} --port {port}", err=True)
