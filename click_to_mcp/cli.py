@@ -356,13 +356,13 @@ def config(name: str | None, client: str, transport: str, host: str, port: int,
             }
 
     # Format output based on client
-    client_key = client.lower()
-    if client_key == "claude-desktop" or client_key == "cursor":
+    client_norm = client.lower()
+    if client_norm == "claude-desktop" or client_norm == "cursor":
         output = {"mcpServers": server_configs}
-    elif client_key == "vscode":
+    elif client_norm == "vscode":
         # VS Code Copilot uses "inputs" and "servers" at top level
         output = {"mcp": {"servers": server_configs}}
-    elif client_key == "windsurf" or client_key == "cline":
+    elif client_norm == "windsurf" or client_norm == "cline":
         output = {"mcpServers": server_configs}
     else:
         output = {"mcpServers": server_configs}
