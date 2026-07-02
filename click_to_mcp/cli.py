@@ -398,7 +398,7 @@ def config(name: str | None, client: str, transport: str, host: str, port: int,
         "cline": "~/.cline/mcp_config.json or via Cline settings",
     }
     click.echo(f"Add this to your {client} config file:", err=True)
-    click.echo(f"  {config_paths.get(client_key, 'client config file')}", err=True)
+    click.echo(f"  {config_paths.get(client_norm, 'client config file')}", err=True)
     if transport != "stdio":
         transport_cmd = "serve-http-streamable" if transport == "streamable-http" else "serve-http"
         click.echo(f"\nNote: Start the server first: click-to-mcp {transport_cmd} {cli_names[0]} --port {port}", err=True)
