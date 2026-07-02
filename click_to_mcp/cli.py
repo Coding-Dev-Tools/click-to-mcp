@@ -344,23 +344,25 @@ def config(name: str | None, client: str, transport: str, host: str, port: int,
         name_counts[n] = name_counts.get(n, 0) + 1
     duplicates = {n for n, c in name_counts.items() if c > 1}
 
-    cli_name_map: dict[str, str] = {}
+    # Build list of (original_name, config_name) pairs — NOT a plain-name-keyed dict,
+    # so duplicate-named CLIs don't overwrite each other.
+    config_pairs: list[tuple[str, str]] = []
     seen_dups: dict[str, int] = {}
     if config_all:
         for cli_info in clis:
             if cli_info.name in duplicates:
                 count = seen_dups.get(cli_info.name, 0)
-                cli_name_map[cli_info.name] = f"{cli_info.name}:{cli_info.module_path or cli_info.package_name}:{count}"
+                config_name = f"{cli_info.name}:{cli_info.module_path or cli_info.package_name}:{count}"
                 seen_dups[cli_info.name] = count + 1
             else:
-                cli_name_map[cli_info.name] = cli_info.name
+                config_name = cli_info.name
+            config_pairs.append((cli_info.name, config_name))
     else:
-        cli_name_map = {cli_names[0]: cli_names[0]}
+        config_pairs = [(cli_names[0], cli_names[0])]
 
     # Build MCP server configs
     server_configs: dict[str, dict] = {}
-    for cli_name in cli_names:
-        config_name = cli_name_map.get(cli_name, cli_name)
+    for cli_name, config_name in config_pairs:
         if transport == "stdio":
             server_configs[config_name] = {
                 "command": "click-to-mcp",
