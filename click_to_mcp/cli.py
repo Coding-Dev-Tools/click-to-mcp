@@ -372,12 +372,11 @@ def config(name: str | None, client: str, transport: str, host: str, port: int,
     if copy_to_clipboard:
         import subprocess as _sp
         try:
-            if sys.platform == "win32":
-                cmd = ["clip"]
-            elif sys.platform == "darwin":
-                cmd = ["pbcopy"]
-            else:
-                cmd = ["xclip", "-selection", "clipboard"]
+            platform_cmds = {
+                "win32": ["clip"],
+                "darwin": ["pbcopy"],
+            }
+            cmd = platform_cmds.get(sys.platform, ["xclip", "-selection", "clipboard"])
             proc = _sp.Popen(cmd, stdin=_sp.PIPE)
             proc.communicate(output_json.encode())
             if proc.returncode == 0:
