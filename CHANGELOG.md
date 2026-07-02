@@ -6,6 +6,7 @@ All notable changes to click-to-mcp will be documented in this file.
 
 ### Added
 
+- Python 3.14 to CI test matrix and PyPI classifiers (#35)
 - npm wrapper (`package.json` + `cli.js`) for npm discoverability and publish workflow (#9)
 - Awesome Codex CLI listing badge (PR #29 merged)
 - `abortage/awesome-mcp` merged badge
