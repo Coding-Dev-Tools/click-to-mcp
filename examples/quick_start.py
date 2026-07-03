@@ -17,6 +17,7 @@ def my_cli():
     """My awesome CLI tool."""
     pass
 
+
 @my_cli.command()
 @click.argument("name")
 @click.option("--loud", is_flag=True, help="Shout the greeting")
@@ -27,6 +28,7 @@ def hello(name: str, loud: bool):
         msg = msg.upper()
     click.echo(msg)
 
+
 @my_cli.command()
 @click.argument("numbers", nargs=-1, type=float)
 @click.option("--operation", type=click.Choice(["sum", "avg", "max", "min"]), default="sum")
@@ -35,8 +37,9 @@ def math(numbers: tuple, operation: str):
     if not numbers:
         click.echo("No numbers provided")
         return
-    result = {"sum": sum, "avg": lambda x: sum(x)/len(x), "max": max, "min": min}[operation](numbers)
+    result = {"sum": sum, "avg": lambda x: sum(x) / len(x), "max": max, "min": min}[operation](numbers)
     click.echo(f"{operation}({numbers}) = {result}")
+
 
 if __name__ == "__main__":
     # That's it! Your CLI is now an MCP server.

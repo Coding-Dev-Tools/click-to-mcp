@@ -89,9 +89,7 @@ def serve_http_streamable(
 
     initialized = False
 
-    def _make_jsonrpc_response(
-        request_id: Any, result: Any = None, error: dict | None = None
-    ) -> dict:
+    def _make_jsonrpc_response(request_id: Any, result: Any = None, error: dict | None = None) -> dict:
         resp: dict[str, Any] = {"jsonrpc": "2.0", "id": request_id}
         if error:
             resp["error"] = error
@@ -108,9 +106,7 @@ def serve_http_streamable(
             msg = json.loads(body)
         except json.JSONDecodeError:
             return JSONResponse(
-                _make_jsonrpc_response(
-                    None, error={"code": -32700, "message": "Parse error"}
-                ),
+                _make_jsonrpc_response(None, error={"code": -32700, "message": "Parse error"}),
                 status_code=400,
             )
 
@@ -134,15 +130,11 @@ def serve_http_streamable(
                         },
                         "serverInfo": server_info,
                     }
-                    responses.append(
-                        _make_jsonrpc_response(req_id, result)
-                    )
+                    responses.append(_make_jsonrpc_response(req_id, result))
 
                 elif method == "ping":
                     # MCP spec: respond with empty result
-                    responses.append(
-                        _make_jsonrpc_response(req_id, {})
-                    )
+                    responses.append(_make_jsonrpc_response(req_id, {}))
 
                 elif method == "notifications/initialized":
                     # No response needed for notifications
@@ -150,9 +142,7 @@ def serve_http_streamable(
 
                 elif method == "tools/list":
                     result = {"tools": mcp_tool_list}  # type: ignore[dict-item, list-item]
-                    responses.append(
-                        _make_jsonrpc_response(req_id, result)
-                    )
+                    responses.append(_make_jsonrpc_response(req_id, result))
 
                 elif method == "tools/call":
                     tool_name = params.get("name", "")
@@ -163,9 +153,7 @@ def serve_http_streamable(
                             "code": -32602,
                             "message": f"Unknown tool: {tool_name}",
                         }
-                        responses.append(
-                            _make_jsonrpc_response(req_id, error=error)
-                        )
+                        responses.append(_make_jsonrpc_response(req_id, error=error))
                         continue
 
                     tool = tool_map[tool_name]
@@ -180,9 +168,7 @@ def serve_http_streamable(
                             ],
                             "isError": False,  # type: ignore[dict-item, list-item]
                         }
-                        responses.append(
-                            _make_jsonrpc_response(req_id, result)
-                        )
+                        responses.append(_make_jsonrpc_response(req_id, result))
                     except Exception as e:
                         result = {
                             "content": [
@@ -193,46 +179,40 @@ def serve_http_streamable(
                             ],
                             "isError": True,  # type: ignore[dict-item, list-item]
                         }
-                        responses.append(
-                            _make_jsonrpc_response(req_id, result)
-                        )
+                        responses.append(_make_jsonrpc_response(req_id, result))
 
                 else:
                     error = {
                         "code": -32601,
                         "message": f"Method not found: {method}",
                     }
-                    responses.append(
-                        _make_jsonrpc_response(req_id, error=error)
-                    )
+                    responses.append(_make_jsonrpc_response(req_id, error=error))
 
             except Exception as e:
                 error = {
                     "code": -32603,
                     "message": f"Internal error: {e}",
                 }
-                responses.append(
-                    _make_jsonrpc_response(req_id, error=error)
-                )
+                responses.append(_make_jsonrpc_response(req_id, error=error))
 
         if not responses:
             # Only notifications were sent — return 204
             return Response(status_code=204)
 
         # Return single response for single message, array for batch
-        body_data = (
-            responses[0] if isinstance(msg, dict) else responses
-        )
+        body_data = responses[0] if isinstance(msg, dict) else responses
         return JSONResponse(body_data)
 
     async def handle_health(request: Request) -> JSONResponse:
         """Health check endpoint."""
-        return JSONResponse({
-            "status": "ok",
-            "name": name,
-            "tools": len(mcp_tool_list),
-            "transport": "streamable-http",
-        })
+        return JSONResponse(
+            {
+                "status": "ok",
+                "name": name,
+                "tools": len(mcp_tool_list),
+                "transport": "streamable-http",
+            }
+        )
 
     app = Starlette(
         routes=[

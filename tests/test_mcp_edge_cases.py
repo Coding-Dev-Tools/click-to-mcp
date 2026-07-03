@@ -26,8 +26,7 @@ def _jsonrpc(method: str, params: dict | None = None, req_id: int = 1) -> str:
 def _run_stdio(messages: list[str]) -> list[dict]:
     """Feed messages to serve_stdio via patched stdin and collect responses."""
     input_data = "\n".join(messages) + "\n"
-    with patch("sys.stdin", StringIO(input_data)), \
-         patch("sys.stdout", new_callable=StringIO) as out:
+    with patch("sys.stdin", StringIO(input_data)), patch("sys.stdout", new_callable=StringIO) as out:
         serve_stdio(demo_cli, name="test-cli", description="Test CLI")
         text = out.getvalue()
     return [json.loads(line) for line in text.strip().splitlines() if line.strip()]
@@ -38,19 +37,23 @@ class TestStdioEdgeCases:
 
     def test_malformed_json_ignored(self) -> None:
         """Invalid JSON lines should be silently ignored."""
-        responses = _run_stdio([
-            "not json at all",
-            _jsonrpc("initialize"),
-        ])
+        responses = _run_stdio(
+            [
+                "not json at all",
+                _jsonrpc("initialize"),
+            ]
+        )
         assert len(responses) == 1
         assert responses[0]["result"]["protocolVersion"] == "2024-11-05"
 
     def test_empty_line_ignored(self) -> None:
         """Empty lines should be ignored."""
-        responses = _run_stdio([
-            "",
-            _jsonrpc("initialize"),
-        ])
+        responses = _run_stdio(
+            [
+                "",
+                _jsonrpc("initialize"),
+            ]
+        )
         assert len(responses) == 1
         assert responses[0]["id"] == 1
 
@@ -69,20 +72,28 @@ class TestStdioEdgeCases:
 
     def test_tools_call_with_missing_arguments(self) -> None:
         """Calling a tool with no arguments (which expects args) should return isError=True."""
-        responses = _run_stdio([
-            _jsonrpc("initialize"),
-            _jsonrpc("tools/call", {"name": "greet"}, req_id=2),
-        ])
+        responses = _run_stdio(
+            [
+                _jsonrpc("initialize"),
+                _jsonrpc("tools/call", {"name": "greet"}, req_id=2),
+            ]
+        )
         call = next(r for r in responses if r.get("id") == 2)
         assert call["result"]["isError"] is True
         assert "Error" in call["result"]["content"][0]["text"]
 
     def test_tools_call_with_extra_arguments(self) -> None:
         """Extra unknown keyword arguments cause Click to raise, so isError=True."""
-        responses = _run_stdio([
-            _jsonrpc("initialize"),
-            _jsonrpc("tools/call", {"name": "calculate", "arguments": {"a": 2, "b": 3, "operation": "add", "unexpected": 1}}, req_id=2),
-        ])
+        responses = _run_stdio(
+            [
+                _jsonrpc("initialize"),
+                _jsonrpc(
+                    "tools/call",
+                    {"name": "calculate", "arguments": {"a": 2, "b": 3, "operation": "add", "unexpected": 1}},
+                    req_id=2,
+                ),
+            ]
+        )
         call = next(r for r in responses if r.get("id") == 2)
         # Click rejects unexpected kwargs, so the handler raises and we get isError=True
         assert call["result"]["isError"] is True
@@ -112,10 +123,12 @@ class TestStdioEdgeCases:
 
     def test_duplicate_initialize(self) -> None:
         """Multiple initialize calls should all succeed."""
-        responses = _run_stdio([
-            _jsonrpc("initialize", req_id=1),
-            _jsonrpc("initialize", req_id=2),
-        ])
+        responses = _run_stdio(
+            [
+                _jsonrpc("initialize", req_id=1),
+                _jsonrpc("initialize", req_id=2),
+            ]
+        )
         assert len(responses) == 2
         for r in responses:
             assert r["result"]["serverInfo"]["version"] == __version__
@@ -135,10 +148,12 @@ class TestStdioEdgeCases:
 
     def test_version_consistency(self) -> None:
         """All initialize responses should use the real package version."""
-        responses = _run_stdio([
-            _jsonrpc("initialize", req_id=1),
-            _jsonrpc("tools/list", req_id=2),
-        ])
+        responses = _run_stdio(
+            [
+                _jsonrpc("initialize", req_id=1),
+                _jsonrpc("tools/list", req_id=2),
+            ]
+        )
         init = next(r for r in responses if r.get("id") == 1)
         assert init["result"]["serverInfo"]["version"] == __version__
 

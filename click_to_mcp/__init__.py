@@ -69,8 +69,7 @@ def run(app: Any, prefix: str = "", name: str = "") -> None:
     )
 
 
-def run_http(app: Any, prefix: str = "", name: str = "",
-             host: str = "127.0.0.1", port: int = 8000) -> None:
+def run_http(app: Any, prefix: str = "", name: str = "", host: str = "127.0.0.1", port: int = 8000) -> None:
     """High-level entry point: serve a Click/typer app as an MCP server over HTTP+SSE.
 
     Requires optional dependencies: pip install 'click-to-mcp[http]'
@@ -95,8 +94,7 @@ def run_http(app: Any, prefix: str = "", name: str = "",
     )
 
 
-def run_http_streamable(app: Any, prefix: str = "", name: str = "",
-                        host: str = "127.0.0.1", port: int = 8001) -> None:
+def run_http_streamable(app: Any, prefix: str = "", name: str = "", host: str = "127.0.0.1", port: int = 8001) -> None:
     """High-level entry point: serve a Click/typer app as an MCP Streamable HTTP server.
 
     Uses a single POST /message endpoint — no SSE required. Simpler than the
@@ -126,7 +124,14 @@ def run_http_streamable(app: Any, prefix: str = "", name: str = "",
 
 __all__ = [
     "__version__",
-    "cli_to_mcp_tools", "CliToolDef", "serve_stdio", "run", "run_http",
+    "cli_to_mcp_tools",
+    "CliToolDef",
+    "serve_stdio",
+    "run",
+    "run_http",
     "run_http_streamable",
-    "scan_entry_points", "load_cli", "find_our_clis", "DiscoveredCLI",
+    "scan_entry_points",
+    "load_cli",
+    "find_our_clis",
+    "DiscoveredCLI",
 ]

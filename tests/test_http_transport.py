@@ -117,8 +117,7 @@ class TestHTTPInitialize:
         assert resp.status_code == 200
         server_version = resp.json()["result"]["serverInfo"]["version"]
         assert server_version == __version__, (
-            f"HTTP+SSE reports version {server_version!r}, "
-            f"but package version is {__version__!r}"
+            f"HTTP+SSE reports version {server_version!r}, but package version is {__version__!r}"
         )
 
 
@@ -257,14 +256,17 @@ class TestSSEEndpoint:
     """Test the SSE endpoint returns proper event."""
 
     def test_sse_endpoint(self, http_server, base_url: str) -> None:
-        with httpx.Client(trust_env=False) as sse_client, sse_client.stream("GET", f"{base_url}/sse", timeout=5) as resp:
-                assert resp.status_code == 200
-                # Read first event
-                for line in resp.iter_lines():
-                    if line.startswith("data:"):
-                        data_content = line[len("data:"):].strip()
-                        assert "/messages" in data_content
-                        break
+        with (
+            httpx.Client(trust_env=False) as sse_client,
+            sse_client.stream("GET", f"{base_url}/sse", timeout=5) as resp,
+        ):
+            assert resp.status_code == 200
+            # Read first event
+            for line in resp.iter_lines():
+                if line.startswith("data:"):
+                    data_content = line[len("data:") :].strip()
+                    assert "/messages" in data_content
+                    break
 
 
 class TestHTTPDepCheck:
@@ -272,5 +274,6 @@ class TestHTTPDepCheck:
 
     def test_check_deps_succeeds(self) -> None:
         from click_to_mcp.http_server import _check_http_deps
+
         # Should not raise since we installed deps
         _check_http_deps()

@@ -177,11 +177,13 @@ def list_tools(name: str | None, list_all: bool, json_output: bool) -> None:
     if json_output:
         output = []
         for tool in all_tools:
-            output.append({
-                "name": tool.name,
-                "description": tool.description,
-                "input_schema": tool.input_schema,
-            })
+            output.append(
+                {
+                    "name": tool.name,
+                    "description": tool.description,
+                    "input_schema": tool.input_schema,
+                }
+            )
         click.echo(_json.dumps(output, indent=2))
     else:
         click.echo(f"Found {len(all_tools)} MCP tool(s):")
@@ -290,20 +292,33 @@ def demo_http_streamable(host: str, port: int) -> None:
 
 @cli.command("config")
 @click.argument("name", required=False, default=None)
-@click.option("--client", "-c", type=click.Choice(
-    ["claude-desktop", "cursor", "vscode", "windsurf", "cline"],
-    case_sensitive=False,
-), default="claude-desktop", help="MCP client to generate config for (default: claude-desktop)")
-@click.option("--transport", "-t", type=click.Choice(
-    ["stdio", "http", "streamable-http"],
-    case_sensitive=False,
-), default="stdio", help="Transport type (default: stdio)")
+@click.option(
+    "--client",
+    "-c",
+    type=click.Choice(
+        ["claude-desktop", "cursor", "vscode", "windsurf", "cline"],
+        case_sensitive=False,
+    ),
+    default="claude-desktop",
+    help="MCP client to generate config for (default: claude-desktop)",
+)
+@click.option(
+    "--transport",
+    "-t",
+    type=click.Choice(
+        ["stdio", "http", "streamable-http"],
+        case_sensitive=False,
+    ),
+    default="stdio",
+    help="Transport type (default: stdio)",
+)
 @click.option("--host", default="127.0.0.1", help="Host for HTTP transport (default: 127.0.0.1)")
 @click.option("--port", default=8000, type=int, help="Port for HTTP transport (default: 8000; streamable-http: 8001)")
 @click.option("--all", "config_all", is_flag=True, help="Generate config for all discoverable CLIs")
 @click.option("--copy", "copy_to_clipboard", is_flag=True, help="Copy to clipboard instead of stdout")
-def config(name: str | None, client: str, transport: str, host: str, port: int,
-           config_all: bool, copy_to_clipboard: bool):
+def config(
+    name: str | None, client: str, transport: str, host: str, port: int, config_all: bool, copy_to_clipboard: bool
+):
     """Generate MCP client configuration JSON.
 
     Prints the JSON snippet to add to your MCP client config file.
@@ -371,6 +386,7 @@ def config(name: str | None, client: str, transport: str, host: str, port: int,
 
     if copy_to_clipboard:
         import subprocess as _sp
+
         try:
             platform_cmds = {
                 "win32": ["clip"],
@@ -401,7 +417,9 @@ def config(name: str | None, client: str, transport: str, host: str, port: int,
     click.echo(f"  {config_paths.get(client_norm, 'client config file')}", err=True)
     if transport != "stdio":
         transport_cmd = "serve-http-streamable" if transport == "streamable-http" else "serve-http"
-        click.echo(f"\nNote: Start the server first: click-to-mcp {transport_cmd} {cli_names[0]} --port {port}", err=True)
+        click.echo(
+            f"\nNote: Start the server first: click-to-mcp {transport_cmd} {cli_names[0]} --port {port}", err=True
+        )
 
 
 def main() -> None:

@@ -118,7 +118,8 @@ def _run_server(messages: list[dict], timeout: int = 15) -> list[dict]:
 
     proc = subprocess.run(
         [
-            sys.executable, "-c",
+            sys.executable,
+            "-c",
             "from click_to_mcp import serve_stdio; "
             "from click_to_mcp.demo import cli; "
             "serve_stdio(cli, name='click-to-mcp-demo')",
@@ -146,9 +147,11 @@ class TestServer:
     """Test MCP server protocol end-to-end via subprocess stdio."""
 
     def test_initialize_response(self) -> None:
-        responses = _run_server([
-            {"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {}},
-        ])
+        responses = _run_server(
+            [
+                {"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {}},
+            ]
+        )
         assert len(responses) >= 1, "Expected at least one response"
         resp = responses[0]
         assert resp["id"] == 1
@@ -158,10 +161,12 @@ class TestServer:
         assert result["serverInfo"]["name"] == "click-to-mcp-demo"
 
     def test_tools_list(self) -> None:
-        responses = _run_server([
-            {"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {}},
-            {"jsonrpc": "2.0", "id": 2, "method": "tools/list", "params": {}},
-        ])
+        responses = _run_server(
+            [
+                {"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {}},
+                {"jsonrpc": "2.0", "id": 2, "method": "tools/list", "params": {}},
+            ]
+        )
         # Find the tools/list response (id=2)
         tools_resp = next((r for r in responses if r.get("id") == 2), None)
         assert tools_resp is not None, "No response for tools/list"
@@ -169,18 +174,22 @@ class TestServer:
         assert len(tools) >= 4, f"Expected >= 4 tools, got {len(tools)}"
 
     def test_tools_call_greet(self) -> None:
-        responses = _run_server([
-            {"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {}},
-            {"jsonrpc": "2.0", "method": "notifications/initialized", "params": {}},
-            {"jsonrpc": "2.0", "id": 2, "method": "tools/list", "params": {}},
-            {
-                "jsonrpc": "2.0", "id": 3, "method": "tools/call",
-                "params": {
-                    "name": "greet",
-                    "arguments": {"name": "World", "greeting": "Hi", "repeat": 1},
+        responses = _run_server(
+            [
+                {"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {}},
+                {"jsonrpc": "2.0", "method": "notifications/initialized", "params": {}},
+                {"jsonrpc": "2.0", "id": 2, "method": "tools/list", "params": {}},
+                {
+                    "jsonrpc": "2.0",
+                    "id": 3,
+                    "method": "tools/call",
+                    "params": {
+                        "name": "greet",
+                        "arguments": {"name": "World", "greeting": "Hi", "repeat": 1},
+                    },
                 },
-            },
-        ])
+            ]
+        )
         call_resp = next((r for r in responses if r.get("id") == 3), None)
         assert call_resp is not None, "No response for tools/call greet"
         result = call_resp["result"]
@@ -189,13 +198,17 @@ class TestServer:
         assert "Hi, World!" in text
 
     def test_unknown_tool_returns_error(self) -> None:
-        responses = _run_server([
-            {"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {}},
-            {
-                "jsonrpc": "2.0", "id": 2, "method": "tools/call",
-                "params": {"name": "nonexistent", "arguments": {}},
-            },
-        ])
+        responses = _run_server(
+            [
+                {"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {}},
+                {
+                    "jsonrpc": "2.0",
+                    "id": 2,
+                    "method": "tools/call",
+                    "params": {"name": "nonexistent", "arguments": {}},
+                },
+            ]
+        )
         call_resp = next((r for r in responses if r.get("id") == 2), None)
         assert call_resp is not None, "No response for tools/call nonexistent"
         assert "error" in call_resp, "Expected an error response for unknown tool"
@@ -203,11 +216,13 @@ class TestServer:
 
     def test_notifications_initialized_returns_no_response(self) -> None:
         """The 'notifications/initialized' notification should produce no output."""
-        responses = _run_server([
-            {"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {}},
-            {"jsonrpc": "2.0", "method": "notifications/initialized", "params": {}},
-            {"jsonrpc": "2.0", "id": 2, "method": "tools/list", "params": {}},
-        ])
+        responses = _run_server(
+            [
+                {"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {}},
+                {"jsonrpc": "2.0", "method": "notifications/initialized", "params": {}},
+                {"jsonrpc": "2.0", "id": 2, "method": "tools/list", "params": {}},
+            ]
+        )
         # Should have exactly 2 responses (initialize + tools/list, no response for notification)
         assert len(responses) == 2
         # First response should be initialize
@@ -231,8 +246,13 @@ class TestDiscover:
 
     def test_discovered_cli_dataclass_fields(self) -> None:
         expected_fields = {
-            "name", "module_path", "attr_name",
-            "package_name", "package_version", "summary", "is_typer",
+            "name",
+            "module_path",
+            "attr_name",
+            "package_name",
+            "package_version",
+            "summary",
+            "is_typer",
         }
         actual_fields = {f.name for f in dataclasses.fields(DiscoveredCLI)}
         assert actual_fields == expected_fields

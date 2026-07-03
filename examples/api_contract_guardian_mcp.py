@@ -30,19 +30,24 @@ from click_to_mcp import run
 #   from api_contract_guardian.cli import app
 #   run(app, prefix="acg")
 
+
 @click.group()
 def acg():
     """API Contract Guardian — validate API contracts against live endpoints."""
     pass
+
 
 @acg.command()
 @click.argument("spec_file", type=click.Path(exists=False))
 @click.option("--base-url", default="http://localhost:8000", help="Base URL of the API")
 @click.option("--strict/--no-strict", default=False, help="Fail on any contract violation")
 @click.option(
-    "--format", "-f", "output_format",
+    "--format",
+    "-f",
+    "output_format",
     type=click.Choice(["json", "table", "junit"]),
-    default="table", help="Output format",
+    default="table",
+    help="Output format",
 )
 def validate(spec_file: str, base_url: str, strict: bool, output_format: str):
     """Validate an OpenAPI spec against a live API."""
@@ -50,6 +55,7 @@ def validate(spec_file: str, base_url: str, strict: bool, output_format: str):
     click.echo(f"  Format: {output_format}")
     click.echo(f"  Strict: {strict}")
     click.echo("✓ All contracts pass")
+
 
 @acg.command()
 @click.argument("spec_file", type=click.Path(exists=False))
@@ -60,6 +66,7 @@ def extract(spec_file: str, output: str):
     click.echo(f"  Output: {output}")
     click.echo("✓ 12 contracts extracted")
 
+
 @acg.command()
 @click.option("--watch/--no-watch", default=False, help="Watch for spec changes")
 @click.option("--interval", default=30, type=int, help="Watch interval in seconds")
@@ -67,6 +74,7 @@ def monitor(watch: bool, interval: int):
     """Monitor API endpoints for contract drift."""
     click.echo(f"Monitoring contracts... (watch={watch}, interval={interval}s)")
     click.echo("✓ No drift detected")
+
 
 if __name__ == "__main__":
     run(acg, prefix="acg", name="api-contract-guardian")
