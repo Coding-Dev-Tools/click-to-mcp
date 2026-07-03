@@ -25,8 +25,7 @@ class TestStdioServer:
     def _run(self, messages: list[str]) -> list[dict]:
         """Feed messages to serve_stdio via patched stdin and collect responses."""
         input_data = "\n".join(messages) + "\n"
-        with patch("sys.stdin", StringIO(input_data)), \
-             patch("sys.stdout", new_callable=StringIO) as out:
+        with patch("sys.stdin", StringIO(input_data)), patch("sys.stdout", new_callable=StringIO) as out:
             serve_stdio(demo_cli, name="test-cli", description="Test CLI")
             text = out.getvalue()
         return [json.loads(line) for line in text.strip().splitlines() if line.strip()]
@@ -34,11 +33,18 @@ class TestStdioServer:
     # -- initialize -----------------------------------------------------------
 
     def test_initialize_returns_server_info(self) -> None:
-        responses = self._run([_jsonrpc("initialize", {
-            "protocolVersion": "2024-11-05",
-            "capabilities": {},
-            "clientInfo": {"name": "test"},
-        })])
+        responses = self._run(
+            [
+                _jsonrpc(
+                    "initialize",
+                    {
+                        "protocolVersion": "2024-11-05",
+                        "capabilities": {},
+                        "clientInfo": {"name": "test"},
+                    },
+                )
+            ]
+        )
         assert len(responses) == 1
         r = responses[0]
         assert r["id"] == 1
@@ -49,10 +55,12 @@ class TestStdioServer:
     # -- tools/list -----------------------------------------------------------
 
     def test_tools_list_returns_definitions(self) -> None:
-        responses = self._run([
-            _jsonrpc("initialize"),
-            _jsonrpc("tools/list", req_id=2),
-        ])
+        responses = self._run(
+            [
+                _jsonrpc("initialize"),
+                _jsonrpc("tools/list", req_id=2),
+            ]
+        )
         tr = next(r for r in responses if r["id"] == 2)
         names = {t["name"] for t in tr["result"]["tools"]}
         assert "greet" in names
@@ -61,28 +69,34 @@ class TestStdioServer:
     # -- tools/call -----------------------------------------------------------
 
     def test_tools_call_executes_handler(self) -> None:
-        responses = self._run([
-            _jsonrpc("initialize"),
-            _jsonrpc("tools/call", {"name": "greet", "arguments": {"name": "World"}}, req_id=2),
-        ])
+        responses = self._run(
+            [
+                _jsonrpc("initialize"),
+                _jsonrpc("tools/call", {"name": "greet", "arguments": {"name": "World"}}, req_id=2),
+            ]
+        )
         cr = next(r for r in responses if r["id"] == 2)
         assert cr["result"]["isError"] is False
         assert "World" in cr["result"]["content"][0]["text"]
 
     def test_tools_call_unknown_tool_returns_error(self) -> None:
-        responses = self._run([
-            _jsonrpc("initialize"),
-            _jsonrpc("tools/call", {"name": "nonexistent"}, req_id=2),
-        ])
+        responses = self._run(
+            [
+                _jsonrpc("initialize"),
+                _jsonrpc("tools/call", {"name": "nonexistent"}, req_id=2),
+            ]
+        )
         cr = next(r for r in responses if r["id"] == 2)
         assert cr["error"]["code"] == -32602
 
     def test_tools_call_handler_exception_returns_is_error(self) -> None:
         """Calling greet without required --name triggers handler RuntimeError."""
-        responses = self._run([
-            _jsonrpc("initialize"),
-            _jsonrpc("tools/call", {"name": "greet", "arguments": {}}, req_id=2),
-        ])
+        responses = self._run(
+            [
+                _jsonrpc("initialize"),
+                _jsonrpc("tools/call", {"name": "greet", "arguments": {}}, req_id=2),
+            ]
+        )
         cr = next(r for r in responses if r["id"] == 2)
         assert cr["result"]["isError"] is True
         assert "Error" in cr["result"]["content"][0]["text"]
@@ -94,18 +108,22 @@ class TestStdioServer:
         assert responses[0]["error"]["code"] == -32601
 
     def test_invalid_json_lines_ignored(self) -> None:
-        responses = self._run([
-            "not valid json{{{",
-            _jsonrpc("initialize"),
-        ])
+        responses = self._run(
+            [
+                "not valid json{{{",
+                _jsonrpc("initialize"),
+            ]
+        )
         assert len(responses) == 1
         assert responses[0]["result"]["protocolVersion"] == "2024-11-05"
 
     def test_notification_initialized_no_response(self) -> None:
-        responses = self._run([
-            _jsonrpc("initialize"),
-            '{"jsonrpc":"2.0","method":"notifications/initialized"}',
-        ])
+        responses = self._run(
+            [
+                _jsonrpc("initialize"),
+                '{"jsonrpc":"2.0","method":"notifications/initialized"}',
+            ]
+        )
         # Only initialize should produce a response
         assert len(responses) == 1
         assert responses[0]["id"] == 1
@@ -125,12 +143,16 @@ class TestStdioServer:
 
     def test_full_mcp_handshake_and_tool_call(self) -> None:
         """Simulate a complete MCP client session."""
-        responses = self._run([
-            _jsonrpc("initialize"),
-            '{"jsonrpc":"2.0","method":"notifications/initialized"}',
-            _jsonrpc("tools/list", req_id=2),
-            _jsonrpc("tools/call", {"name": "calculate", "arguments": {"a": 2, "b": 3, "operation": "add"}}, req_id=3),
-        ])
+        responses = self._run(
+            [
+                _jsonrpc("initialize"),
+                '{"jsonrpc":"2.0","method":"notifications/initialized"}',
+                _jsonrpc("tools/list", req_id=2),
+                _jsonrpc(
+                    "tools/call", {"name": "calculate", "arguments": {"a": 2, "b": 3, "operation": "add"}}, req_id=3
+                ),
+            ]
+        )
         init = next(r for r in responses if r["id"] == 1)
         assert init["result"]["serverInfo"]["name"] == "test-cli"
 
@@ -148,6 +170,5 @@ class TestStdioServer:
         responses = self._run([_jsonrpc("initialize")])
         server_version = responses[0]["result"]["serverInfo"]["version"]
         assert server_version == __version__, (
-            f"stdio server reports version {server_version!r}, "
-            f"but package version is {__version__!r}"
+            f"stdio server reports version {server_version!r}, but package version is {__version__!r}"
         )

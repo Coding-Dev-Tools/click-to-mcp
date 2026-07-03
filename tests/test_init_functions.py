@@ -21,6 +21,7 @@ class TestResolveServerMeta:
 
     def _resolve(self, app: click.Group, prefix: str = "", name: str = ""):
         from click_to_mcp import _resolve_server_meta  # type: ignore[attr-defined]
+
         return _resolve_server_meta(app, prefix, name)
 
     def test_empty_name_falls_back_to_cli(self) -> None:
@@ -65,6 +66,7 @@ class TestRunHighLevel:
     @pytest.fixture()
     def demo_app(self) -> click.Group:
         from click_to_mcp.demo import cli as demo_cli
+
         return demo_cli
 
     def test_run_calls_serve_stdio(self, demo_app: click.Group) -> None:
@@ -123,8 +125,16 @@ class TestModuleExports:
         import click_to_mcp
 
         expected = {
-            "__version__", "cli_to_mcp_tools", "CliToolDef", "serve_stdio",
-            "run", "run_http", "run_http_streamable",
-            "scan_entry_points", "load_cli", "find_our_clis", "DiscoveredCLI",
+            "__version__",
+            "cli_to_mcp_tools",
+            "CliToolDef",
+            "serve_stdio",
+            "run",
+            "run_http",
+            "run_http_streamable",
+            "scan_entry_points",
+            "load_cli",
+            "find_our_clis",
+            "DiscoveredCLI",
         }
         assert set(click_to_mcp.__all__) == expected

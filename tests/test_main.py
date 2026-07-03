@@ -15,7 +15,8 @@ class TestMainModule:
         """python -m click_to_mcp should run without crashing."""
         result = subprocess.run(
             [sys.executable, "-m", "click_to_mcp", "--version"],
-            capture_output=True, text=True,
+            capture_output=True,
+            text=True,
             timeout=5,
         )
         assert result.returncode == 0

@@ -55,9 +55,7 @@ class TestConfigCommand:
 
     def test_config_http_transport(self, runner: CliRunner) -> None:
         """Config with --transport http uses URL instead of command."""
-        result = runner.invoke(cli, [
-            "config", "click-to-mcp-demo", "--transport", "http", "--port", "9000"
-        ])
+        result = runner.invoke(cli, ["config", "click-to-mcp-demo", "--transport", "http", "--port", "9000"])
         assert result.exit_code == 0
         data = _extract_json(result.output)
         server = data["mcpServers"]["click-to-mcp-demo"]
@@ -67,9 +65,7 @@ class TestConfigCommand:
 
     def test_config_streamable_http_transport(self, runner: CliRunner) -> None:
         """Config with --transport streamable-http uses /message endpoint."""
-        result = runner.invoke(cli, [
-            "config", "click-to-mcp-demo", "--transport", "streamable-http", "--port", "8001"
-        ])
+        result = runner.invoke(cli, ["config", "click-to-mcp-demo", "--transport", "streamable-http", "--port", "8001"])
         assert result.exit_code == 0
         data = _extract_json(result.output)
         server = data["mcpServers"]["click-to-mcp-demo"]
@@ -77,10 +73,9 @@ class TestConfigCommand:
 
     def test_config_custom_host(self, runner: CliRunner) -> None:
         """Config with --host uses custom host in URL."""
-        result = runner.invoke(cli, [
-            "config", "click-to-mcp-demo", "--transport", "http",
-            "--host", "0.0.0.0", "--port", "3000"
-        ])
+        result = runner.invoke(
+            cli, ["config", "click-to-mcp-demo", "--transport", "http", "--host", "0.0.0.0", "--port", "3000"]
+        )
         assert result.exit_code == 0
         data = _extract_json(result.output)
         server = data["mcpServers"]["click-to-mcp-demo"]

@@ -30,7 +30,10 @@ def _write_response(response: str) -> None:
 
 
 def serve_stdio(
-    cli_group, name: str = "cli", description: str = "", prefix: str = "",
+    cli_group,
+    name: str = "cli",
+    description: str = "",
+    prefix: str = "",
 ) -> None:
     """Start an MCP stdio server that exposes a Click CLI as MCP tools.
 
@@ -76,19 +79,25 @@ def serve_stdio(
         try:
             if method == "initialize":
                 # Respond with capabilities
-                response = _make_jsonrpc_response(req_id, {
-                    "protocolVersion": "2024-11-05",
-                    "capabilities": {
-                        "tools": {},
+                response = _make_jsonrpc_response(
+                    req_id,
+                    {
+                        "protocolVersion": "2024-11-05",
+                        "capabilities": {
+                            "tools": {},
+                        },
+                        "serverInfo": server_info,
                     },
-                    "serverInfo": server_info,
-                })
+                )
                 _write_response(response)
 
             elif method == "tools/list":
-                response = _make_jsonrpc_response(req_id, {
-                    "tools": mcp_tool_list,
-                })
+                response = _make_jsonrpc_response(
+                    req_id,
+                    {
+                        "tools": mcp_tool_list,
+                    },
+                )
                 _write_response(response)
 
             elif method == "tools/call":

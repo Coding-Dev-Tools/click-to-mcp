@@ -86,7 +86,6 @@ def serve_http(
         "description": description or f"MCP server for {name}",
     }
 
-
     def _make_jsonrpc_response(request_id: Any, result: Any = None, error: dict | None = None) -> dict:
         resp: dict[str, Any] = {"jsonrpc": "2.0", "id": request_id}
         if error:
@@ -97,6 +96,7 @@ def serve_http(
 
     async def handle_sse(request: Request) -> EventSourceResponse:
         """SSE endpoint for server-to-client messages."""
+
         async def event_generator() -> AsyncGenerator:
             yield {
                 "event": "endpoint",
@@ -195,12 +195,14 @@ def serve_http(
 
     async def handle_health(request: Request) -> JSONResponse:
         """Health check endpoint."""
-        return JSONResponse({
-            "status": "ok",
-            "name": name,
-            "tools": len(mcp_tool_list),
-            "transport": "http+sse",
-        })
+        return JSONResponse(
+            {
+                "status": "ok",
+                "name": name,
+                "tools": len(mcp_tool_list),
+                "transport": "http+sse",
+            }
+        )
 
     app = Starlette(
         routes=[

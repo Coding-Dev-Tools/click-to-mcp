@@ -16,6 +16,7 @@ from typing import Any
 @dataclass
 class DiscoveredCLI:
     """Information about a discovered Click/typer CLI."""
+
     name: str
     module_path: str
     attr_name: str
@@ -76,15 +77,17 @@ def scan_entry_points() -> list[DiscoveredCLI]:
             pkg_version = entry_point.dist.version if entry_point.dist else "?"
             summary = _get_package_metadata(pkg_name)
 
-            discovered.append(DiscoveredCLI(
-                name=entry_point.name,
-                module_path=entry_point.module,
-                attr_name=entry_point.attr if entry_point.attr else "",
-                package_name=pkg_name,
-                package_version=pkg_version,
-                summary=summary,
-                is_typer=(cli_type == "typer"),
-            ))
+            discovered.append(
+                DiscoveredCLI(
+                    name=entry_point.name,
+                    module_path=entry_point.module,
+                    attr_name=entry_point.attr if entry_point.attr else "",
+                    package_name=pkg_name,
+                    package_version=pkg_version,
+                    summary=summary,
+                    is_typer=(cli_type == "typer"),
+                )
+            )
         except (Exception, SystemExit):
             continue
 
@@ -153,7 +156,10 @@ def find_our_clis() -> dict[str, Any]:
         eps = eps_all.get("console_scripts", [])  # type: ignore[attr-defined]
 
     our_modules = [
-        "api_contract_guardian", "json2sql", "deploydiff", "configdrift",
+        "api_contract_guardian",
+        "json2sql",
+        "deploydiff",
+        "configdrift",
     ]
 
     for ep in eps:

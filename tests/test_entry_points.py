@@ -19,7 +19,8 @@ class TestMainModule:
         """python -m click_to_mcp --help works (covers __main__.py:2-4)."""
         result = subprocess.run(
             [sys.executable, "-m", "click_to_mcp", "--help"],
-            capture_output=True, text=False,
+            capture_output=True,
+            text=False,
         )
         assert result.returncode == 0
         assert b"Usage" in result.stdout
@@ -30,6 +31,7 @@ class TestResolveServerMetaEdgeCases:
 
     def _resolve(self, app, prefix="", name=""):
         from click_to_mcp import _resolve_server_meta  # type: ignore[attr-defined]
+
         return _resolve_server_meta(app, prefix, name)
 
     def test_non_string_help_becomes_str(self):
@@ -42,6 +44,7 @@ class TestResolveServerMetaEdgeCases:
         """run_http() calls serve_http with correct prefix."""
         from click_to_mcp import run_http
         from click_to_mcp.demo import cli as demo_app
+
         with patch("click_to_mcp.http_server.serve_http") as mock:
             run_http(demo_app, prefix="test", name="demo")
         mock.assert_called_once()

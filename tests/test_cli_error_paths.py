@@ -76,4 +76,5 @@ class TestTopLevelCliErrorPaths:
         result = runner.invoke(cli, ["--version"])
         assert result.exit_code == 0
         from click_to_mcp._version import __version__
+
         assert __version__ in result.output
