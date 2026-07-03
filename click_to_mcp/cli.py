@@ -345,7 +345,6 @@ def config(
             sys.exit(1)
         cli_names = [c.name for c in clis]
     else:
-        # Verify the CLI exists
         target_cli = load_cli(name or "")
         if target_cli is None:
             click.echo(f"Error: CLI '{name}' not found.", err=True)
@@ -353,20 +352,43 @@ def config(
             sys.exit(1)
         cli_names = [name or ""]
 
+    # Accommodate duplicate CLI names across packages by appending a stable
+    # disambiguator based on module path for the output keys.
+    name_counts: dict[str, int] = {}
+    for n in cli_names:
+        name_counts[n] = name_counts.get(n, 0) + 1
+    duplicates = {n for n, c in name_counts.items() if c > 1}
+
+    # Build list of (original_name, config_name) pairs — NOT a plain-name-keyed dict,
+    # so duplicate-named CLIs don't overwrite each other.
+    config_pairs: list[tuple[str, str]] = []
+    seen_dups: dict[str, int] = {}
+    if config_all:
+        for cli_info in clis:
+            if cli_info.name in duplicates:
+                count = seen_dups.get(cli_info.name, 0)
+                config_name = f"{cli_info.name}:{cli_info.module_path or cli_info.package_name}:{count}"
+                seen_dups[cli_info.name] = count + 1
+            else:
+                config_name = cli_info.name
+            config_pairs.append((cli_info.name, config_name))
+    else:
+        config_pairs = [(cli_names[0], cli_names[0])]
+
     # Build MCP server configs
     server_configs: dict[str, dict] = {}
-    for cli_name in cli_names:
+    for cli_name, config_name in config_pairs:
         if transport == "stdio":
-            server_configs[cli_name] = {
+            server_configs[config_name] = {
                 "command": "click-to-mcp",
                 "args": ["serve", cli_name],
             }
         elif transport == "http":
-            server_configs[cli_name] = {
+            server_configs[config_name] = {
                 "url": f"http://{host}:{port}/sse",
             }
         elif transport == "streamable-http":
-            server_configs[cli_name] = {
+            server_configs[config_name] = {
                 "url": f"http://{host}:{port}/message",
             }
 
