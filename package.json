@@ -22,7 +22,7 @@
   "homepage": "https://github.com/Coding-Dev-Tools/click-to-mcp",
   "repository": "https://github.com/Coding-Dev-Tools/click-to-mcp",
   "license": "Apache-2.0",
-  "author": "Revenue Holdings",
+  "author": "Coding-Dev-Tools",
   "bin": {
     "click-to-mcp": "cli.js",
     "click-to-mcp-demo": "cli-demo.js"
