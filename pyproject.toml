@@ -9,7 +9,7 @@ description = "Auto-wrap any Click/typer CLI as an MCP (Model Context Protocol) 
 readme = "README.md"
 license = { text = "Apache-2.0" }
 authors = [
-    { name = "DevForge", email = "dev@devforge.dev" },
+    { name = "Coding-Dev-Tools", email = "dev@devforge.dev" },
 ]
 requires-python = ">=3.10"
 dependencies = [
