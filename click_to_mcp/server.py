@@ -23,8 +23,17 @@ def _make_jsonrpc_response(request_id: Any, result: Any = None, error: dict | No
     return json.dumps(resp)
 
 
+def _write_response(response: str) -> None:
+    """Write a JSON-RPC response to stdout and flush."""
+    sys.stdout.write(response + "\n")
+    sys.stdout.flush()
+
+
 def serve_stdio(
-    cli_group, name: str = "cli", description: str = "", prefix: str = "",
+    cli_group,
+    name: str = "cli",
+    description: str = "",
+    prefix: str = "",
 ) -> None:
     """Start an MCP stdio server that exposes a Click CLI as MCP tools.
 
@@ -70,22 +79,26 @@ def serve_stdio(
         try:
             if method == "initialize":
                 # Respond with capabilities
-                response = _make_jsonrpc_response(req_id, {
-                    "protocolVersion": "2024-11-05",
-                    "capabilities": {
-                        "tools": {},
+                response = _make_jsonrpc_response(
+                    req_id,
+                    {
+                        "protocolVersion": "2024-11-05",
+                        "capabilities": {
+                            "tools": {},
+                        },
+                        "serverInfo": server_info,
                     },
-                    "serverInfo": server_info,
-                })
-                sys.stdout.write(response + "\n")
-                sys.stdout.flush()
+                )
+                _write_response(response)
 
             elif method == "tools/list":
-                response = _make_jsonrpc_response(req_id, {
-                    "tools": mcp_tool_list,
-                })
-                sys.stdout.write(response + "\n")
-                sys.stdout.flush()
+                response = _make_jsonrpc_response(
+                    req_id,
+                    {
+                        "tools": mcp_tool_list,
+                    },
+                )
+                _write_response(response)
 
             elif method == "tools/call":
                 tool_name = params.get("name", "")
@@ -97,8 +110,7 @@ def serve_stdio(
                         "message": f"Unknown tool: {tool_name}",
                     }
                     response = _make_jsonrpc_response(req_id, error=error)
-                    sys.stdout.write(response + "\n")
-                    sys.stdout.flush()
+                    _write_response(response)
                     continue
 
                 tool = tool_map[tool_name]
@@ -127,14 +139,12 @@ def serve_stdio(
                     }
                     response = _make_jsonrpc_response(req_id, result)
 
-                sys.stdout.write(response + "\n")
-                sys.stdout.flush()
+                _write_response(response)
 
             elif method == "ping":
                 # MCP spec: respond with empty result
                 response = _make_jsonrpc_response(req_id, {})
-                sys.stdout.write(response + "\n")
-                sys.stdout.flush()
+                _write_response(response)
 
             elif method == "notifications/initialized":
                 # No response needed for notifications
@@ -146,8 +156,7 @@ def serve_stdio(
                     "message": f"Method not found: {method}",
                 }
                 response = _make_jsonrpc_response(req_id, error=error)
-                sys.stdout.write(response + "\n")
-                sys.stdout.flush()
+                _write_response(response)
 
         except Exception as e:
             error = {
@@ -155,5 +164,4 @@ def serve_stdio(
                 "message": f"Internal error: {e}",
             }
             response = _make_jsonrpc_response(req_id, error=error)
-            sys.stdout.write(response + "\n")
-            sys.stdout.flush()
+            _write_response(response)

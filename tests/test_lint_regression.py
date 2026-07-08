@@ -17,12 +17,11 @@ class TestW292TrailingNewline:
         assert target.exists(), f"Target file not found: {target}"
 
         result = subprocess.run(
-            [sys.executable, "-m", "ruff", "check", "--select=W292",
-             "--output-format=concise", str(target)],
-            capture_output=True, text=True,
+            [sys.executable, "-m", "ruff", "check", "--select=W292", "--output-format=concise", str(target)],
+            capture_output=True,
+            text=True,
         )
 
         assert result.returncode == 0, (
-            f"W292 (missing trailing newline) violations in {target}:\n"
-            f"{result.stdout}\n{result.stderr}"
+            f"W292 (missing trailing newline) violations in {target}:\n{result.stdout}\n{result.stderr}"
         )

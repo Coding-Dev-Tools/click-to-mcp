@@ -46,7 +46,7 @@ def _click_type_to_json_schema(param: click.Parameter) -> dict[str, Any]:
     else:
         base["type"] = "string"
 
-    base["description"] = getattr(param, 'help', None) or ""
+    base["description"] = getattr(param, "help", None) or ""
     if not param.required:
         default = param.default if param.default is not None and param.default != () else None
         # Check for Click Sentinel (UNSET) values
@@ -121,8 +121,7 @@ def _build_click_tool_def(cmd: click.Command, prefix: str = "") -> CliToolDef | 
         result = runner.invoke(cmd, args, catch_exceptions=False)
         if result.exit_code != 0:
             raise RuntimeError(
-                f"Command '{full_name}' failed (exit {result.exit_code}):\n"
-                f"{result.output}\n{result.exception}"
+                f"Command '{full_name}' failed (exit {result.exit_code}):\n{result.output}\n{result.exception}"
             )
         return result.output
 
@@ -152,6 +151,7 @@ def _get_click_group(cli: Any) -> click.Group:
     # typer.Typer — use Typer's own get_command to produce a click Group
     if hasattr(cli, "registered_commands") and hasattr(cli, "registered_groups"):
         from typer.main import get_command as typer_get_command
+
         click_cmd = typer_get_command(cli)
         if isinstance(click_cmd, click.Group):
             return click_cmd
@@ -160,9 +160,7 @@ def _get_click_group(cli: Any) -> click.Group:
         group.add_command(click_cmd)
         return group
 
-    raise TypeError(
-        f"Expected click.Group or typer.Typer, got {type(cli).__name__}"
-    )
+    raise TypeError(f"Expected click.Group or typer.Typer, got {type(cli).__name__}")
 
 
 def cli_to_mcp_tools(cli, prefix: str = "") -> list[CliToolDef]:

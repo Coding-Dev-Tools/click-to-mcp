@@ -128,8 +128,7 @@ class TestInitialize:
         assert resp.status_code == 200
         server_version = resp.json()["result"]["serverInfo"]["version"]
         assert server_version == __version__, (
-            f"streamable HTTP reports version {server_version!r}, "
-            f"but package version is {__version__!r}"
+            f"streamable HTTP reports version {server_version!r}, but package version is {__version__!r}"
         )
 
 
@@ -324,5 +323,6 @@ class TestDepCheck:
 
     def test_check_deps_succeeds(self) -> None:
         from click_to_mcp.streamable_http import _check_http_deps
+
         # Should not raise since we installed deps
         _check_http_deps()

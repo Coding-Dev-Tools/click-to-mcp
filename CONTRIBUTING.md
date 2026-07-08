@@ -9,7 +9,7 @@ Thanks for your interest in contributing!
 3. Install dev dependencies: pip install -e ".[dev]"
 4. Run tests: pytest tests/ -v
 5. Lint: 
-ruff check src/
+ruff check click_to_mcp/
 
 ## Pull Requests
 
@@ -17,7 +17,7 @@ ruff check src/
 - Add tests for any new functionality
 - Ensure all existing tests pass
 - Run 
-ruff check src/ --fix before committing
+ruff check click_to_mcp/ --fix before committing
 - Keep PRs focused on a single change
 
 ## Reporting Issues

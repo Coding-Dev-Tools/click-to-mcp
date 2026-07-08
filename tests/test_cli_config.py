@@ -1,4 +1,4 @@
-﻿"""CLI-level tests for the 'config' command.
+"""CLI-level tests for the 'config' command.
 
 Tests MCP client configuration generation across clients, transports,
 and edge cases like --all and --copy flags.
@@ -62,12 +62,19 @@ class TestConfigCli:
 
     def test_config_transport_http(self, runner: CliRunner) -> None:
         """Config with --transport http should produce URL-based config."""
-        result = runner.invoke(cli, [
-            "config", "click-to-mcp-demo",
-            "--transport", "http",
-            "--host", "0.0.0.0",
-            "--port", "9000",
-        ])
+        result = runner.invoke(
+            cli,
+            [
+                "config",
+                "click-to-mcp-demo",
+                "--transport",
+                "http",
+                "--host",
+                "0.0.0.0",
+                "--port",
+                "9000",
+            ],
+        )
         assert result.exit_code == 0
         parsed = json.loads(result.stdout)
         svr = parsed["mcpServers"]["click-to-mcp-demo"]
@@ -76,11 +83,17 @@ class TestConfigCli:
 
     def test_config_transport_streamable_http(self, runner: CliRunner) -> None:
         """Config with --transport streamable-http should use /message endpoint."""
-        result = runner.invoke(cli, [
-            "config", "click-to-mcp-demo",
-            "--transport", "streamable-http",
-            "--port", "8001",
-        ])
+        result = runner.invoke(
+            cli,
+            [
+                "config",
+                "click-to-mcp-demo",
+                "--transport",
+                "streamable-http",
+                "--port",
+                "8001",
+            ],
+        )
         assert result.exit_code == 0
         parsed = json.loads(result.stdout)
         svr = parsed["mcpServers"]["click-to-mcp-demo"]
@@ -117,20 +130,30 @@ class TestConfigCli:
 
     def test_config_case_insensitive_client(self, runner: CliRunner) -> None:
         """Config's --client option should be case-insensitive."""
-        result = runner.invoke(cli, [
-            "config", "click-to-mcp-demo",
-            "--client", "CLAUDE-DESKTOP",
-        ])
+        result = runner.invoke(
+            cli,
+            [
+                "config",
+                "click-to-mcp-demo",
+                "--client",
+                "CLAUDE-DESKTOP",
+            ],
+        )
         assert result.exit_code == 0
         parsed = json.loads(result.stdout)
         assert "mcpServers" in parsed
 
     def test_config_case_insensitive_transport(self, runner: CliRunner) -> None:
         """Config's --transport option should be case-insensitive."""
-        result = runner.invoke(cli, [
-            "config", "click-to-mcp-demo",
-            "--transport", "HTTP",
-        ])
+        result = runner.invoke(
+            cli,
+            [
+                "config",
+                "click-to-mcp-demo",
+                "--transport",
+                "HTTP",
+            ],
+        )
         assert result.exit_code == 0
         parsed = json.loads(result.stdout)
         svr = parsed["mcpServers"]["click-to-mcp-demo"]

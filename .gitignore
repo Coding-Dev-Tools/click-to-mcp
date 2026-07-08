@@ -71,3 +71,6 @@ Thumbs.db
 research/
 fixtures/generated/
 .ruff_cache/
+
+# Node.js
+node_modules/

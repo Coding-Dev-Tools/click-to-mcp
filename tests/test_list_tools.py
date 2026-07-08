@@ -53,11 +53,13 @@ class TestListToolsAdapter:
         tools = cli_to_mcp_tools(demo_cli, prefix="demo")
         output = []
         for tool in tools:
-            output.append({
-                "name": tool.name,
-                "description": tool.description,
-                "input_schema": tool.input_schema,
-            })
+            output.append(
+                {
+                    "name": tool.name,
+                    "description": tool.description,
+                    "input_schema": tool.input_schema,
+                }
+            )
         json_str = json.dumps(output, indent=2)
         parsed = json.loads(json_str)
         assert isinstance(parsed, list)
