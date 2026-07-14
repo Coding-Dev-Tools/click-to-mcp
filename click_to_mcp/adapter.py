@@ -27,26 +27,65 @@ def _param_type_name(t: Any) -> str:
     return type(t).__name__
 
 
-def _click_type_to_json_schema(param: click.Parameter) -> dict[str, Any]:
-    """Map a Click parameter type to a JSON Schema property definition."""
-    base: dict[str, Any] = {}
+def _element_json_schema(param: click.Parameter) -> dict[str, Any]:
+    """Map a Click parameter's *element* type to a scalar JSON Schema fragment.
 
+    This is the per-value type, independent of whether the parameter accepts a
+    single value or many (see :func:`_is_multi_valued`).
+    """
     t = param.type
     t_name = _param_type_name(t)
+    element: dict[str, Any] = {}
 
     if isinstance(t, click.Choice):
-        base["type"] = "string"
-        base["enum"] = t.choices
+        element["type"] = "string"
+        element["enum"] = t.choices
     elif t_name in ("IntParamType", "INT"):
-        base["type"] = "integer"
+        element["type"] = "integer"
     elif t_name in ("FloatParamType", "FLOAT"):
-        base["type"] = "number"
+        element["type"] = "number"
     elif t_name in ("BoolParamType", "BOOLEAN"):
-        base["type"] = "boolean"
+        element["type"] = "boolean"
     else:
-        base["type"] = "string"
+        element["type"] = "string"
+
+    return element
+
+
+def _is_multi_valued(param: click.Parameter) -> bool:
+    """True if the parameter accepts more than one value.
+
+    Covers ``multiple=True`` options (repeatable flags) as well as variadic
+    (``nargs=-1``) and fixed-tuple (``nargs>1``) options/arguments.
+    """
+    if getattr(param, "multiple", False):
+        return True
+    nargs = getattr(param, "nargs", 1)
+    return nargs == -1 or (isinstance(nargs, int) and nargs > 1)
+
+
+def _click_type_to_json_schema(param: click.Parameter) -> dict[str, Any]:
+    """Map a Click parameter type to a JSON Schema property definition.
+
+    Multi-valued parameters (``multiple=True``, or ``nargs=-1`` / ``nargs>1``)
+    are mapped to an ``array`` whose ``items`` carry the element type, instead
+    of being silently flattened to a single scalar string. Fixed-length tuple
+    parameters (``nargs>1``) additionally constrain the array length.
+    """
+    element = _element_json_schema(param)
+
+    if _is_multi_valued(param):
+        base: dict[str, Any] = {"type": "array", "items": element}
+        nargs = getattr(param, "nargs", 1)
+        # Fixed-length tuple option/argument (e.g. nargs=2): pin the length.
+        if not getattr(param, "multiple", False) and isinstance(nargs, int) and nargs > 1:
+            base["minItems"] = nargs
+            base["maxItems"] = nargs
+    else:
+        base = element
 
     base["description"] = getattr(param, "help", None) or ""
+
     if not param.required:
         default = param.default if param.default is not None and param.default != () else None
         # Check for Click Sentinel (UNSET) values
@@ -55,9 +94,21 @@ def _click_type_to_json_schema(param: click.Parameter) -> dict[str, Any]:
             if default_str == "Sentinel.UNSET" or "Sentinel" in default_str:
                 default = None
         if default is not None and default is not inspect.Parameter.empty:
+            # Click represents multiple/nargs defaults as tuples; JSON wants a list.
+            if isinstance(default, tuple):
+                default = list(default)
             base["default"] = default
 
     return base
+
+
+def _append_option(args: list[str], opt: str, val: Any) -> None:
+    """Append a single scalar option value to the CLI arg list."""
+    if isinstance(val, bool):
+        if val:
+            args.append(opt)
+    else:
+        args.extend([opt, str(val)])
 
 
 def _build_click_tool_def(cmd: click.Command, prefix: str = "") -> CliToolDef | None:
@@ -73,6 +124,8 @@ def _build_click_tool_def(cmd: click.Command, prefix: str = "") -> CliToolDef | 
     properties: dict[str, Any] = {}
     required: list[str] = []
     positional_args: list[str] = []  # track positional arg order
+    multiple_opts: set[str] = set()  # options with multiple=True (repeat the flag)
+    nargs_opts: set[str] = set()  # options with nargs>1 (one flag, many values)
 
     for param in cmd.params:
         if isinstance(param, click.Option):
@@ -81,6 +134,12 @@ def _build_click_tool_def(cmd: click.Command, prefix: str = "") -> CliToolDef | 
             key = names[0].lstrip("-").replace("-", "_") if names else (param.name or "")
             if not key or key == "ctx":
                 continue
+            if getattr(param, "multiple", False):
+                multiple_opts.add(key)
+            else:
+                nargs = getattr(param, "nargs", 1)
+                if isinstance(nargs, int) and nargs > 1:
+                    nargs_opts.add(key)
         elif isinstance(param, click.Argument):
             key = param.name or ""
             if not key:
@@ -100,11 +159,16 @@ def _build_click_tool_def(cmd: click.Command, prefix: str = "") -> CliToolDef | 
         runner = CliRunner()
         args: list[str] = []
 
-        # Positional args first (in order of definition)
+        # Positional args first (in order of definition). Variadic positionals
+        # (nargs=-1 / nargs>1) arrive as a list/tuple and expand to one arg each.
         for pos_key in positional_args:
             if pos_key in kwargs:
                 val = kwargs.pop(pos_key)
-                if val is not None:
+                if val is None:
+                    continue
+                if isinstance(val, (list, tuple)):
+                    args.extend(str(v) for v in val)
+                else:
                     args.append(str(val))
 
         # Then options
@@ -112,11 +176,23 @@ def _build_click_tool_def(cmd: click.Command, prefix: str = "") -> CliToolDef | 
             if val is None:
                 continue
             opt = f"--{key.replace('_', '-')}"
-            if isinstance(val, bool):
-                if val:
-                    args.append(opt)
+            if key in multiple_opts:
+                # Repeatable option: emit the flag once per value.
+                values = val if isinstance(val, (list, tuple)) else [val]
+                for v in values:
+                    if isinstance(v, (list, tuple)):
+                        # multiple=True combined with nargs>1: flag + N values.
+                        args.append(opt)
+                        args.extend(str(x) for x in v)
+                    else:
+                        _append_option(args, opt, v)
+            elif key in nargs_opts:
+                # Fixed-tuple option: one flag followed by all its values.
+                values = val if isinstance(val, (list, tuple)) else [val]
+                args.append(opt)
+                args.extend(str(v) for v in values)
             else:
-                args.extend([opt, str(val)])
+                _append_option(args, opt, val)
 
         result = runner.invoke(cmd, args, catch_exceptions=False)
         if result.exit_code != 0:
