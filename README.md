@@ -2,7 +2,7 @@
 <!-- mcp-name: io.github.coding-dev-tools/click-to-mcp -->
 
 [![CI](https://github.com/Coding-Dev-Tools/click-to-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/Coding-Dev-Tools/click-to-mcp/actions/workflows/ci.yml)
-[![PyPI](https://img.shields.io/pypi/v/click-to-mcp)](https://pypi.org/project/click-to-mcp/)
+[![PyPI](https://img.shields.io/badge/PyPI-not%20published-red)](https://github.com/Coding-Dev-Tools/click-to-mcp)
 [![GitHub stars](https://img.shields.io/github/stars/Coding-Dev-Tools/click-to-mcp?style=social)](https://github.com/Coding-Dev-Tools/click-to-mcp/stargazers)
 [![Awesome MCP Server](https://img.shields.io/badge/Awesome_MCP_Server-Listed-brightgreen?logo=github)](https://github.com/abordage/awesome-mcp)
 [![Awesome Codex CLI](https://img.shields.io/badge/Awesome_Codex_CLI-Listed-brightgreen?logo=github)](https://github.com/milisp/awesome-codex-cli)
@@ -28,7 +28,7 @@ Part of the [DevForge](https://coding-dev-tools.github.io/devforge/) developer t
 
 **The click-to-mcp way:**
 ```bash
-pip install click-to-mcp
+pip install git+https://github.com/Coding-Dev-Tools/click-to-mcp.git
 click-to-mcp serve your-cli
 ```
 
@@ -40,16 +40,16 @@ Works with [DevForge CLI tools](https://coding-dev-tools.github.io/devforge/) ou
 
 ## Quick Start
 
-Install from PyPI (recommended):
+Install from GitHub (recommended — not yet on public PyPI):
 
 ```bash
-pip install click-to-mcp
+pip install git+https://github.com/Coding-Dev-Tools/click-to-mcp.git
 ```
 
 For HTTP+SSE transport (web-based MCP clients), install with the `http` extra:
 
 ```bash
-pip install "click-to-mcp[http]"
+pip install "click-to-mcp[http] @ git+https://github.com/Coding-Dev-Tools/click-to-mcp.git"
 ```
 
 Install directly from GitHub (latest development version):
@@ -253,7 +253,7 @@ click-to-mcp discover
 # Serve a specific CLI as an MCP server over stdio
 click-to-mcp serve <name>
 
-# Serve over HTTP+SSE (requires pip install "click-to-mcp[http]")
+# Serve over HTTP+SSE (requires pip install "click-to-mcp[http] @ git+https://github.com/Coding-Dev-Tools/click-to-mcp.git")
 click-to-mcp serve-http <name> --port 8000
 
 # Serve the built-in demo
@@ -326,7 +326,7 @@ Best for web-based MCP clients, remote access, and multi-user setups. Requires t
 
 ```bash
 # Install HTTP dependencies
-pip install "click-to-mcp[http]"
+pip install "click-to-mcp[http] @ git+https://github.com/Coding-Dev-Tools/click-to-mcp.git"
 
 # Start an HTTP+SSE server
 click-to-mcp serve-http <name> --host 127.0.0.1 --port 8000
