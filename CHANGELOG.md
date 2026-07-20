@@ -34,6 +34,7 @@ All notable changes to click-to-mcp will be documented in this file.
 - 7 ruff lint errors resolved
 - UTF-8 encoding (mojibake) in source files
 - `npm badge` reference fixed in README
+- JSON Schema maps `click.IntRange`/`click.FloatRange` options to `integer`/`number` with `minimum`/`maximum` (and `exclusiveMinimum`/`exclusiveMaximum` for open bounds) instead of a generic `string` (#37)
 
 ## [0.5.0] — 2026-05-18
 

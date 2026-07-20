@@ -27,8 +27,30 @@ def _param_type_name(t: Any) -> str:
     return type(t).__name__
 
 
+def _apply_range_bounds(element: dict[str, Any], rng: Any) -> None:
+    """Add JSON Schema numeric bounds from a click IntRange/FloatRange.
+
+    Honors open vs closed bounds via ``minimum``/``maximum`` vs
+    ``exclusiveMinimum``/``exclusiveMaximum``. No-op when a bound is
+    unset (e.g. an open-ended range).
+    """
+    lo = getattr(rng, "min", None)
+    hi = getattr(rng, "max", None)
+    if lo is not None:
+        if getattr(rng, "min_open", False):
+            element["exclusiveMinimum"] = lo
+        else:
+            element["minimum"] = lo
+    if hi is not None:
+        if getattr(rng, "max_open", False):
+            element["exclusiveMaximum"] = hi
+        else:
+            element["maximum"] = hi
+
+
 def _element_json_schema(param: click.Parameter) -> dict[str, Any]:
     """Map a Click parameter's *element* type to a scalar JSON Schema fragment.
+
 
     This is the per-value type, independent of whether the parameter accepts a
     single value or many (see :func:`_is_multi_valued`).
@@ -46,6 +68,12 @@ def _element_json_schema(param: click.Parameter) -> dict[str, Any]:
         element["type"] = "number"
     elif t_name in ("BoolParamType", "BOOLEAN"):
         element["type"] = "boolean"
+    elif t_name in ("IntRange",):
+        element["type"] = "integer"
+        _apply_range_bounds(element, t)
+    elif t_name in ("FloatRange",):
+        element["type"] = "number"
+        _apply_range_bounds(element, t)
     else:
         element["type"] = "string"
 

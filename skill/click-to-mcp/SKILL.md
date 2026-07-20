@@ -29,7 +29,7 @@ This works because Click and typer CLIs already define structured interfaces (co
 ### 1. Install
 
 ```bash
-pip install click-to-mcp
+pip install git+https://github.com/Coding-Dev-Tools/click-to-mcp.git
 # or: uvx click-to-mcp
 # or: npm install -g click-to-mcp
 ```
