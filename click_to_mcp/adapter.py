@@ -51,6 +51,7 @@ def _apply_range_bounds(element: dict[str, Any], rng: Any) -> None:
 def _element_json_schema(param: click.Parameter) -> dict[str, Any]:
     """Map a Click parameter's *element* type to a scalar JSON Schema fragment.
 
+
     This is the per-value type, independent of whether the parameter accepts a
     single value or many (see :func:`_is_multi_valued`).
     """
