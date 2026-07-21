@@ -429,7 +429,10 @@ def config(
     # Print helpful instructions
     click.echo("", err=True)
     config_paths = {
-        "claude-desktop": "~/Library/Application Support/Claude/claude_desktop_config.json (macOS)\n  %APPDATA%\\Claude\\claude_desktop_config.json (Windows)",
+        "claude-desktop": (
+            "~/Library/Application Support/Claude/claude_desktop_config.json (macOS)\n"
+            "  %APPDATA%\\Claude\\claude_desktop_config.json (Windows)"
+        ),
         "cursor": ".cursor/mcp.json (in project root)",
         "vscode": ".vscode/mcp.json (in project root)",
         "windsurf": ".windsurf/mcp.json (in project root)",
