@@ -115,6 +115,17 @@ def load_cli(cli_name: str) -> Any | None:
                 return entry_point.load()
             except Exception:
                 return None
+
+    # Fallback: built-in demo CLI bundled with this package.
+    # When running from a source checkout without `pip install -e .`,
+    # the entry point may not be registered, but we can still import directly.
+    if cli_name == "click-to-mcp-demo":
+        try:
+            from .demo import cli as demo_cli
+            return demo_cli
+        except Exception:
+            return None
+
     return None
 
 
