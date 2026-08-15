@@ -8,9 +8,12 @@ them as MCP servers.
 from __future__ import annotations
 
 import importlib
+import logging
 from dataclasses import dataclass
 from importlib.metadata import distribution, entry_points
 from typing import Any
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -47,7 +50,8 @@ def _get_package_metadata(pkg_name: str) -> str:
     try:
         dist = distribution(pkg_name)
         return dist.metadata.get("Summary", "") or ""
-    except Exception:
+    except Exception as exc:
+        logger.debug("Failed to get metadata for package %r: %s", pkg_name, exc)
         return ""
 
 
@@ -88,7 +92,13 @@ def scan_entry_points() -> list[DiscoveredCLI]:
                     is_typer=(cli_type == "typer"),
                 )
             )
-        except (Exception, SystemExit):
+        except (Exception, SystemExit) as exc:
+            logger.debug(
+                "Skipping entry point %r (%s): %s",
+                entry_point.name,
+                getattr(entry_point, "module", "?"),
+                exc,
+            )
             continue
 
     return discovered
@@ -113,7 +123,8 @@ def load_cli(cli_name: str) -> Any | None:
         if entry_point.name == cli_name:
             try:
                 return entry_point.load()
-            except Exception:
+            except Exception as exc:
+                logger.debug("Failed to load entry point %r: %s", cli_name, exc)
                 return None
 
     # Fallback: built-in demo CLI bundled with this package.
@@ -123,7 +134,8 @@ def load_cli(cli_name: str) -> Any | None:
         try:
             from .demo import cli as demo_cli
             return demo_cli
-        except Exception:
+        except Exception as exc:
+            logger.debug("Failed to import built-in demo CLI: %s", exc)
             return None
 
     return None
@@ -149,7 +161,10 @@ def import_cli(module_path: str, attr_name: str) -> Any | None:
             if obj is not None:
                 return obj
         return module
-    except Exception:
+    except Exception as exc:
+        logger.debug(
+            "Failed to import CLI from %s.%s: %s", module_path, attr_name, exc
+        )
         return None
 
 
@@ -179,7 +194,8 @@ def find_our_clis() -> dict[str, Any]:
                 obj = ep.load()
                 if _probe_cli_type(obj) != "unknown":
                     result[ep.name] = obj
-            except Exception:
+            except Exception as exc:
+                logger.debug("Failed to load our CLI %r: %s", ep.name, exc)
                 continue
 
     return result
