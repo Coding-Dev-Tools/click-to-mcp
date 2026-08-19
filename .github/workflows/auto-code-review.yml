@@ -25,4 +25,4 @@ permissions:
 
 jobs:
   code-review:
-    uses: Coding-Dev-Tools/.github/.github/workflows/auto-code-review.yml@main
+    uses: Coding-Dev-Tools/.github/.github/workflows/auto-code-review.yml@9114bb00d7f7a8e1a06310700bb7a539c3034c37  # main (pinned)
