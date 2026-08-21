@@ -72,6 +72,17 @@ def serve_stdio(
         except json.JSONDecodeError:
             continue
 
+        if not isinstance(msg, dict):
+            # JSON-RPC 2.0 requires requests to be objects; a non-object
+            # payload must not kill the server loop (previously raised
+            # AttributeError and terminated the stdio server).
+            _write_response(
+                _make_jsonrpc_response(
+                    None, error={"code": -32600, "message": "Invalid Request: expected JSON object"}
+                )
+            )
+            continue
+
         req_id = msg.get("id")
         method = msg.get("method", "")
         params = msg.get("params", {})

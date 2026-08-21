@@ -112,6 +112,13 @@ def serve_http_streamable(
 
         # Support both single message and batch (array)
         messages = msg if isinstance(msg, list) else [msg]
+        if any(not isinstance(m, dict) for m in messages):
+            return JSONResponse(
+                _make_jsonrpc_response(
+                    None, error={"code": -32600, "message": "Invalid Request: expected JSON object(s)"}
+                ),
+                status_code=400,
+            )
         responses: list[dict] = []
 
         for single_msg in messages:
