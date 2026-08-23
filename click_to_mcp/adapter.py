@@ -154,6 +154,8 @@ def _build_click_tool_def(cmd: click.Command, prefix: str = "") -> CliToolDef | 
     positional_args: list[str] = []  # track positional arg order
     multiple_opts: set[str] = set()  # options with multiple=True (repeat the flag)
     nargs_opts: set[str] = set()  # options with nargs>1 (one flag, many values)
+    opt_strings: dict[str, str] = {}  # key -> actual primary option string ("-x" / "--xx")
+    negation_opts: dict[str, str] = {}  # key -> "--no-xx" counterpart of a flag pair
 
     for param in cmd.params:
         if isinstance(param, click.Option):
@@ -162,6 +164,11 @@ def _build_click_tool_def(cmd: click.Command, prefix: str = "") -> CliToolDef | 
             key = names[0].lstrip("-").replace("-", "_") if names else (param.name or "")
             if not key or key == "ctx":
                 continue
+            # Remember the real option spelling so the handler never invents one.
+            opt_strings[key] = names[0] if names else (param.opts[0] if param.opts else f"--{key.replace(chr(95), chr(45))}")
+            secondary = list(getattr(param, "secondary_opts", []))
+            if secondary:
+                negation_opts[key] = secondary[0]
             if getattr(param, "multiple", False):
                 multiple_opts.add(key)
             else:
@@ -203,7 +210,18 @@ def _build_click_tool_def(cmd: click.Command, prefix: str = "") -> CliToolDef | 
         for key, val in kwargs.items():
             if val is None:
                 continue
-            opt = f"--{key.replace('_', '-')}"
+            opt = opt_strings.get(key, f"--{key.replace('_', '-')}")
+            # Boolean False on a --x/--no-x pair must emit the negative flag,
+            # not be silently dropped (the command would run with its default).
+            if (
+                isinstance(val, bool)
+                and not val
+                and key in negation_opts
+                and key not in multiple_opts
+                and key not in nargs_opts
+            ):
+                args.append(negation_opts[key])
+                continue
             if key in multiple_opts:
                 # Repeatable option: emit the flag once per value.
                 values = val if isinstance(val, (list, tuple)) else [val]
