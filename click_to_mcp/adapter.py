@@ -159,6 +159,10 @@ def _build_click_tool_def(cmd: click.Command, prefix: str = "") -> CliToolDef | 
 
     for param in cmd.params:
         if isinstance(param, click.Option):
+            # Hidden options are intentionally undocumented surface: never
+            # expose them as MCP tool properties.
+            if getattr(param, "hidden", False):
+                continue
             # Prefer the long option name (--foo) over short (-f)
             names = [n for n in param.opts if n.startswith("--")]
             key = names[0].lstrip("-").replace("-", "_") if names else (param.name or "")
@@ -176,6 +180,9 @@ def _build_click_tool_def(cmd: click.Command, prefix: str = "") -> CliToolDef | 
                 if isinstance(nargs, int) and nargs > 1:
                     nargs_opts.add(key)
         elif isinstance(param, click.Argument):
+            # Hidden arguments stay out of the exposed schema too.
+            if getattr(param, "hidden", False):
+                continue
             key = param.name or ""
             if not key:
                 continue
@@ -295,6 +302,10 @@ def cli_to_mcp_tools(cli, prefix: str = "") -> list[CliToolDef]:
     tools: list[CliToolDef] = []
 
     for name, cmd in cli.commands.items():
+        # Hidden commands are intentionally undocumented: skip them entirely
+        # so they never become MCP tools.
+        if getattr(cmd, "hidden", False):
+            continue
         if isinstance(cmd, click.Group):
             nested_prefix = f"{prefix}_{name}".strip("_") if prefix else name
             tools.extend(cli_to_mcp_tools(cmd, nested_prefix))
