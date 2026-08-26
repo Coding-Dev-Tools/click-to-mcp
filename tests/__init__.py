@@ -1,1 +1,0 @@
-"""Tests for click-to-mcp — covers adapter, CLI, server, HTTP, and streamable HTTP transports."""

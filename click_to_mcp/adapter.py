@@ -154,14 +154,25 @@ def _build_click_tool_def(cmd: click.Command, prefix: str = "") -> CliToolDef | 
     positional_args: list[str] = []  # track positional arg order
     multiple_opts: set[str] = set()  # options with multiple=True (repeat the flag)
     nargs_opts: set[str] = set()  # options with nargs>1 (one flag, many values)
+    opt_strings: dict[str, str] = {}  # key -> actual primary option string ("-x" / "--xx")
+    negation_opts: dict[str, str] = {}  # key -> "--no-xx" counterpart of a flag pair
 
     for param in cmd.params:
         if isinstance(param, click.Option):
+            # Hidden options are intentionally undocumented surface: never
+            # expose them as MCP tool properties.
+            if getattr(param, "hidden", False):
+                continue
             # Prefer the long option name (--foo) over short (-f)
             names = [n for n in param.opts if n.startswith("--")]
             key = names[0].lstrip("-").replace("-", "_") if names else (param.name or "")
             if not key or key == "ctx":
                 continue
+            # Remember the real option spelling so the handler never invents one.
+            opt_strings[key] = names[0] if names else (param.opts[0] if param.opts else f"--{key.replace(chr(95), chr(45))}")
+            secondary = list(getattr(param, "secondary_opts", []))
+            if secondary:
+                negation_opts[key] = secondary[0]
             if getattr(param, "multiple", False):
                 multiple_opts.add(key)
             else:
@@ -169,6 +180,9 @@ def _build_click_tool_def(cmd: click.Command, prefix: str = "") -> CliToolDef | 
                 if isinstance(nargs, int) and nargs > 1:
                     nargs_opts.add(key)
         elif isinstance(param, click.Argument):
+            # Hidden arguments stay out of the exposed schema too.
+            if getattr(param, "hidden", False):
+                continue
             key = param.name or ""
             if not key:
                 continue
@@ -203,7 +217,18 @@ def _build_click_tool_def(cmd: click.Command, prefix: str = "") -> CliToolDef | 
         for key, val in kwargs.items():
             if val is None:
                 continue
-            opt = f"--{key.replace('_', '-')}"
+            opt = opt_strings.get(key, f"--{key.replace('_', '-')}")
+            # Boolean False on a --x/--no-x pair must emit the negative flag,
+            # not be silently dropped (the command would run with its default).
+            if (
+                isinstance(val, bool)
+                and not val
+                and key in negation_opts
+                and key not in multiple_opts
+                and key not in nargs_opts
+            ):
+                args.append(negation_opts[key])
+                continue
             if key in multiple_opts:
                 # Repeatable option: emit the flag once per value.
                 values = val if isinstance(val, (list, tuple)) else [val]
@@ -277,6 +302,10 @@ def cli_to_mcp_tools(cli, prefix: str = "") -> list[CliToolDef]:
     tools: list[CliToolDef] = []
 
     for name, cmd in cli.commands.items():
+        # Hidden commands are intentionally undocumented: skip them entirely
+        # so they never become MCP tools.
+        if getattr(cmd, "hidden", False):
+            continue
         if isinstance(cmd, click.Group):
             nested_prefix = f"{prefix}_{name}".strip("_") if prefix else name
             tools.extend(cli_to_mcp_tools(cmd, nested_prefix))
