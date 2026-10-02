@@ -1,0 +1,18 @@
+{
+  "name": "click-to-mcp",
+  "description": "Auto-wrap any Click/typer CLI as an MCP server — zero-code transformation. Supports stdio, HTTP+SSE, and Streamable HTTP transport with automatic tool discovery. Turn your Python CLI tools into MCP servers Claude Code can call directly.",
+  "version": "0.5.0",
+  "author": {
+    "name": "Revenue Holdings"
+  },
+  "keywords": [
+    "mcp",
+    "cli",
+    "click",
+    "typer",
+    "devops",
+    "automation",
+    "python",
+    "server"
+  ]
+}
