@@ -16,7 +16,7 @@ jobs:
       # without this step every run failed with "not a git repository" and no
       # PR was ever opened (fleet-wide defect: 11/11 seeded copies lacked it).
       - name: Check out the pushed branch
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
         with:
           ref: ${{ github.ref_name }}
           fetch-depth: 0
