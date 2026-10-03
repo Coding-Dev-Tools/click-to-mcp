@@ -116,6 +116,14 @@ def serve_http(
                 status_code=400,
             )
 
+        if not isinstance(msg, dict):
+            return JSONResponse(
+                _make_jsonrpc_response(
+                    None, error={"code": -32600, "message": "Invalid Request: expected JSON object"}
+                ),
+                status_code=400,
+            )
+
         req_id = msg.get("id")
         method = msg.get("method", "")
         params = msg.get("params", {})
